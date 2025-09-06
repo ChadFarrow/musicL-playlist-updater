@@ -1,0 +1,22 @@
+{
+  "github": {
+    "token": "",
+    "repoOwner": "ChadFarrow",
+    "repoName": "chadf-musicl-playlists",
+    "repoBranch": "test-branch",
+    "enableSync": false
+  },
+  "monitoring": {
+    "checkIntervalMinutes": 5,
+    "maxRetries": 3,
+    "retryDelayMs": 5000
+  },
+  "storage": {
+    "playlistsDir": "./test-playlists",
+    "dataDir": "./test-data"
+  },
+  "logging": {
+    "level": "debug"
+  },
+  "testMode": true
+}

@@ -1,0 +1,35 @@
+{"level":"info","message":"Discovering playlists in docs folder...","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.517Z"}
+{"level":"info","message":"Found 9 XML playlist files","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.639Z"}
+{"level":"info","message":"Analyzing playlist: HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.639Z"}
+{"level":"info","message":"Parsed playlist: HGH-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.809Z"}
+{"level":"info","message":"Analyzing playlist: IAM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.809Z"}
+{"level":"info","message":"Parsed playlist: IAM-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.880Z"}
+{"level":"info","message":"Analyzing playlist: ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.881Z"}
+{"level":"info","message":"Parsed playlist: ITDV-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.955Z"}
+{"level":"info","message":"Analyzing playlist: MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:05.955Z"}
+{"level":"info","message":"Parsed playlist: MMM-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.043Z"}
+{"level":"info","message":"Analyzing playlist: MMT-muic-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.043Z"}
+{"level":"info","message":"Parsed playlist: MMT-muic-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.107Z"}
+{"level":"info","message":"Analyzing playlist: SAS-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.108Z"}
+{"level":"info","message":"Parsed playlist: SAS-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.186Z"}
+{"level":"info","message":"Analyzing playlist: b4ts-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.186Z"}
+{"level":"info","message":"Parsed playlist: b4ts-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.251Z"}
+{"level":"info","message":"Analyzing playlist: flowgnar-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.251Z"}
+{"level":"info","message":"Parsed playlist: flowgnar-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.334Z"}
+{"level":"info","message":"Analyzing playlist: upbeats-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.334Z"}
+{"level":"info","message":"Parsed playlist: upbeats-music-playlist (0 items)","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.433Z"}
+{"level":"info","message":"Updated playlist config with 9 playlists","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.434Z"}
+{"level":"info","message":"Discovered 9 playlists","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:55:06.434Z"}
+{"level":"error","message":"Error loading playlist configs: require is not defined","service":"musicl-playlist-updater","stack":"ReferenceError: require is not defined\n    at Scheduler.getPlaylistConfigs (file:///Users/chad-mini/Vibe/musicL%20playlist%20updater/src/services/Scheduler.js:269:18)\n    at Scheduler.getStatus (file:///Users/chad-mini/Vibe/musicL%20playlist%20updater/src/services/Scheduler.js:327:30)\n    at MusicLPlaylistUpdater.getStatus (file:///Users/chad-mini/Vibe/musicL%20playlist%20updater/src/index.js:153:27)\n    at testSystem (file:///Users/chad-mini/Vibe/musicL%20playlist%20updater/test-system.js:13:28)\n    at file:///Users/chad-mini/Vibe/musicL%20playlist%20updater/test-system.js:35:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)","timestamp":"2025-09-05T20:55:33.825Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:58:50.082Z"}
+{"level":"info","message":"Generated playlist locally: playlists/HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T20:58:50.478Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Homegrown Hits Podcast (TEST)","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:16:15.537Z"}
+{"level":"info","message":"Generated playlist locally: test-playlists/HGH-music-playlist-TEST.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:16:16.064Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:17:02.933Z"}
+{"level":"info","message":"Generated playlist locally: playlists/HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:17:03.281Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Test Feed","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:31:09.398Z"}
+{"level":"info","message":"Generated playlist locally: playlists/test-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:31:09.783Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Test Feed","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:46:52.360Z"}
+{"level":"info","message":"Generated playlist locally: playlists/test-position.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:46:52.783Z"}
+{"level":"info","message":"Generating playlist from RSS feed: ITDV-music-playlist Feed","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:51:45.498Z"}
+{"level":"info","message":"Generated playlist locally: playlists/ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:51:45.920Z"}

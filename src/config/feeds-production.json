@@ -1,0 +1,28 @@
+{
+  "rssFeeds": [
+    {
+      "id": "homegrown-hits-feed",
+      "name": "Homegrown Hits Podcast",
+      "rssUrl": "https://feed.homegrownhits.xyz/feed.xml",
+      "playlistId": "HGH-music-playlist",
+      "playlistTitle": "ChadF Homegrown Hits Music Playlist",
+      "playlistDescription": "Curated playlist from Homegrown Hits podcast featuring Value4Value independent artists",
+      "playlistAuthor": "ChadFarrow",
+      "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/HGH-playlist-art.webp",
+      "enabled": true,
+      "lastChecked": null,
+      "lastEpisodeGuid": null,
+      "checkIntervalMinutes": 30
+    }
+  ],
+  "playlists": [],
+  "settings": {
+    "defaultCheckInterval": 30,
+    "maxRetries": 3,
+    "retryDelayMs": 5000,
+    "enableGitHubSync": true,
+    "enableNotifications": true,
+    "monitorMode": "rss-to-playlist",
+    "productionMode": true
+  }
+}

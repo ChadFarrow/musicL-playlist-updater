@@ -1,0 +1,42 @@
+{
+  "name": "musicl-playlist-updater",
+  "version": "1.0.0",
+  "description": "Automated RSS feed monitor and musicL playlist updater",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test src/**/*.test.js",
+    "setup": "node scripts/setup.js",
+    "sandbox": "node test-sandbox.js",
+    "sandbox:setup": "node test-sandbox.js setup",
+    "sandbox:test": "node test-sandbox.js test",
+    "sandbox:restore": "node test-sandbox.js restore",
+    "sandbox:status": "node test-sandbox.js status",
+    "update": "node music-playlist-updater.js update",
+    "update-all": "node music-playlist-updater.js update-all",
+    "status": "node update-cli.js status",
+    "build": "node build-music-playlist.js",
+    "rebuild": "node build-music-playlist.js rebuild"
+  },
+  "keywords": ["rss", "podcast", "musicl", "playlist", "automation"],
+  "author": "ChadFarrow",
+  "license": "MIT",
+  "dependencies": {
+    "rss-parser": "^3.13.0",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.2",
+    "xml2js": "^0.6.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "node-fetch": "^3.3.2",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "rssFeeds": [
+    {
+      "id": "homegrown-hits-feed",
+      "name": "Homegrown Hits Podcast",
+      "rssUrl": "https://feed.homegrownhits.xyz/feed.xml",
+      "playlistId": "HGH-music-playlist",
+      "playlistTitle": "ChadF Homegrown Hits Music Playlist",
+      "playlistDescription": "Curated playlist from Homegrown Hits podcast featuring Value4Value independent artists",
+      "playlistAuthor": "ChadFarrow",
+      "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/HGH-playlist-art.webp",
+      "enabled": true,
+      "lastChecked": null,
+      "lastEpisodeGuid": null,
+      "checkIntervalMinutes": 5
+    },
+    {
+      "id": "into-doerfelverse-feed",
+      "name": "Into The Doerfel-Verse Podcast",
+      "rssUrl": "https://www.doerfelverse.com/feeds/intothedoerfelverse.xml",
+      "playlistId": "ITDV-music-playlist",
+      "playlistTitle": "ITDV music playlist",
+      "playlistDescription": "Every music reference from Into The Doerfel-Verse podcast",
+      "playlistAuthor": "ChadF",
+      "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/ITDV-music-playlist.webp",
+      "enabled": true,
+      "lastChecked": null,
+      "lastEpisodeGuid": null,
+      "checkIntervalMinutes": 5
+    }
+  ],
+  "playlists": [],
+  "settings": {
+    "defaultCheckInterval": 5,
+    "maxRetries": 3,
+    "retryDelayMs": 5000,
+    "enableGitHubSync": true,
+    "enableNotifications": false,
+    "monitorMode": "rss-to-playlist",
+    "productionMode": true
+  }
+}
