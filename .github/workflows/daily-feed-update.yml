@@ -37,12 +37,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Check if there are changes to commit
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "Auto-update: Daily RSS feed check and playlist update [skip ci]"
+          # Only commit config changes (feeds.json), not playlist files
+          # Playlists are synced to target repo via GitHub API, not git commits
+          if [ -f "src/config/feeds.json" ] && [ -n "$(git status --porcelain src/config/feeds.json)" ]; then
+            git add src/config/feeds.json
+            git commit -m "Auto-update: Update feed configuration after playlist discovery [skip ci]"
             git push
           else
-            echo "No changes to commit"
+            echo "No config changes to commit (playlists are synced directly to target repo via API)"
           fi
 

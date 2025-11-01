@@ -70,3 +70,418 @@
 {"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:45:44.878Z"}
 {"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:45:44.878Z"}
 {"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:45:45.479Z"}
+{"level":"info","message":"Restoring playlists from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.483Z"}
+{"level":"info","message":"Target repository: ChadFarrow/chadf-musicl-playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.485Z"}
+{"level":"info","message":"Fetching playlist files from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.486Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.737Z"}
+{"level":"info","message":"Found 10 playlist file(s) to restore:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.737Z"}
+{"level":"info","message":"  - HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.738Z"}
+{"level":"info","message":"  - IAM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.738Z"}
+{"level":"info","message":"  - ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.738Z"}
+{"level":"info","message":"  - MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.738Z"}
+{"level":"info","message":"  - MMT-muic-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"  - SAS-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"  - b4ts-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"  - chadf-musicl-publisher.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"  - flowgnar-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"  - upbeats-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:55.739Z"}
+{"level":"info","message":"Successfully updated docs/HGH-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:56.840Z"}
+{"level":"info","message":"Restored docs/HGH-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:56.840Z"}
+{"level":"info","message":"Successfully updated docs/IAM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:57.638Z"}
+{"level":"info","message":"Restored docs/IAM-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:57.638Z"}
+{"level":"info","message":"Successfully updated docs/ITDV-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:58.508Z"}
+{"level":"info","message":"Restored docs/ITDV-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:58.508Z"}
+{"level":"info","message":"Successfully updated docs/MMM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:59.838Z"}
+{"level":"info","message":"Restored docs/MMM-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:48:59.839Z"}
+{"level":"info","message":"Successfully updated docs/MMT-muic-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:00.751Z"}
+{"level":"info","message":"Restored docs/MMT-muic-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:00.751Z"}
+{"level":"info","message":"Successfully updated docs/SAS-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:01.882Z"}
+{"level":"info","message":"Restored docs/SAS-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:01.882Z"}
+{"level":"info","message":"Successfully updated docs/b4ts-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:02.745Z"}
+{"level":"info","message":"Restored docs/b4ts-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:02.745Z"}
+{"level":"info","message":"Successfully updated docs/chadf-musicl-publisher.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:03.494Z"}
+{"level":"info","message":"Restored docs/chadf-musicl-publisher.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:03.494Z"}
+{"level":"info","message":"Successfully updated docs/flowgnar-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:04.445Z"}
+{"level":"info","message":"Restored docs/flowgnar-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:04.445Z"}
+{"level":"info","message":"Successfully updated docs/upbeats-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:49:05.529Z"}
+{"level":"info","message":"🧪 Testing playlist format preservation for all feeds...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:22.919Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.203Z"}
+{"level":"info","message":"Parsed 2 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.205Z"}
+{"level":"info","message":"Testing 2 playlist(s)...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.205Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: Some","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.205Z"}
+{"level":"warn","message":"Playlist not found: Some","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.437Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: Playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.437Z"}
+{"level":"warn","message":"Playlist not found: Playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:23.566Z"}
+{"level":"info","message":"🧪 Testing playlist format preservation for all feeds...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:41.155Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:41.414Z"}
+{"level":"info","message":"Discovered 9 playlists with RSS feeds","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.852Z"}
+{"level":"info","message":"Testing 9 playlist(s)...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.853Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: HGH-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.853Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.951Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 841 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.951Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feed.homegrownhits.xyz/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:42.952Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.434Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 109 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.435Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.435Z"}
+{"level":"info","message":"  ✅ Test passed for HGH-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.435Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: IAM-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.435Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.542Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 342 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.542Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://itsamood.org/itsamoodrss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:43.543Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.207Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 37 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.207Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.207Z"}
+{"level":"info","message":"  ✅ Test passed for IAM-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.207Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: ITDV-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.207Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.299Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 126 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.299Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://www.doerfelverse.com/feeds/intothedoerfelverse.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:44.299Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.704Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 62 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.704Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.704Z"}
+{"level":"info","message":"  ✅ Test passed for ITDV-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.704Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: MMM-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.704Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.802Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 1468 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.803Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://mmmusic-project.ams3.cdn.digitaloceanspaces.com/Mutton_Mead__Music/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:45.803Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.206Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 112 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.206Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.206Z"}
+{"level":"info","message":"  ✅ Test passed for MMM-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.206Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: MMT-muic-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.206Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.332Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 155 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.333Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://mikesmixtape.com/mikesmixtaperss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.333Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.774Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 9 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.774Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.774Z"}
+{"level":"info","message":"  ✅ Test passed for MMT-muic-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.774Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: SAS-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.774Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.872Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 728 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.872Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://satsandsounds.com/saspodcast.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:46.872Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.303Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 100 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.303Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.303Z"}
+{"level":"info","message":"  ✅ Test passed for SAS-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.303Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: b4ts-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.303Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.427Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 565 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.428Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://music.behindthesch3m3s.com/b4ts%20feed/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:47.428Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.849Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 56 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.849Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.849Z"}
+{"level":"info","message":"  ✅ Test passed for b4ts-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.849Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: flowgnar-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.849Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.956Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 242 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.956Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feeds.oncetold.net/80000060","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:48.956Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.264Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 21 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.264Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.264Z"}
+{"level":"info","message":"  ✅ Test passed for flowgnar-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.264Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: upbeats-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.264Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.395Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 554 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.395Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feeds.rssblue.com/upbeats","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:49.395Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:51:50.011Z"}
+{"level":"info","message":"🧪 Testing playlist format preservation for all feeds...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:09.510Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:10.201Z"}
+{"level":"info","message":"Discovered 9 playlists with RSS feeds","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.308Z"}
+{"level":"info","message":"Testing 9 playlist(s)...\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.308Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: HGH-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.309Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.425Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 841 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.425Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feed.homegrownhits.xyz/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:12.425Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.066Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 109 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.066Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.066Z"}
+{"level":"info","message":"  ✅ Test passed for HGH-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.066Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: IAM-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.066Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.191Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 342 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.191Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://itsamood.org/itsamoodrss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.192Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.612Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 37 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.612Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.612Z"}
+{"level":"info","message":"  ✅ Test passed for IAM-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.612Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: ITDV-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.612Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.731Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 126 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.731Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://www.doerfelverse.com/feeds/intothedoerfelverse.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:13.731Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.006Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 62 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.006Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.006Z"}
+{"level":"info","message":"  ✅ Test passed for ITDV-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.006Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: MMM-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.006Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.129Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 1468 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.129Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://mmmusic-project.ams3.cdn.digitaloceanspaces.com/Mutton_Mead__Music/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.129Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.460Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 112 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.461Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.461Z"}
+{"level":"info","message":"  ✅ Test passed for MMM-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.461Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: MMT-muic-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.461Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.575Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 155 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.575Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://mikesmixtape.com/mikesmixtaperss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.575Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.898Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 9 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.899Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.899Z"}
+{"level":"info","message":"  ✅ Test passed for MMT-muic-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.899Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: SAS-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:14.899Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.017Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 728 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.018Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://satsandsounds.com/saspodcast.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.018Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.609Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 100 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.609Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.609Z"}
+{"level":"info","message":"  ✅ Test passed for SAS-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.609Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: b4ts-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.609Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.752Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 565 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.753Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://music.behindthesch3m3s.com/b4ts%20feed/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:15.753Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.073Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 56 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.073Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.073Z"}
+{"level":"info","message":"  ✅ Test passed for b4ts-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.073Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: flowgnar-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.073Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.180Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 242 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.180Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feeds.oncetold.net/80000060","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.180Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.405Z"}
+{"level":"info","message":"  📊 Generated: 0 items, 21 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.405Z"}
+{"level":"info","message":"  ✅ Format preserved correctly!","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.405Z"}
+{"level":"info","message":"  ✅ Test passed for flowgnar-music-playlist\n","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.405Z"}
+{"level":"info","message":"\n🧪 Testing format preservation for: upbeats-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.405Z"}
+{"level":"info","message":"  📋 Existing format detected: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.523Z"}
+{"level":"info","message":"  📊 Existing: 0 items, 554 remoteItems","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.524Z"}
+{"level":"info","message":"  🔗 RSS Feed: https://feeds.rssblue.com/upbeats","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:16.524Z"}
+{"level":"info","message":"  ✨ Generated format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:17.048Z"}
+{"level":"info","message":"Starting daily RSS feed update","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:35.708Z"}
+{"level":"info","message":"Fetching FEEDS.md from target repository...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:35.710Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:35.944Z"}
+{"level":"info","message":"Parsed 2 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:35.945Z"}
+{"level":"info","message":"Found 2 playlist ID(s) in FEEDS.md: Some, Playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:35.945Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:36.059Z"}
+{"level":"info","message":"Discovered 9 playlists with RSS feeds","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.366Z"}
+{"level":"warn","message":"No matching playlists found in docs/ for FEEDS.md entries","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.366Z"}
+{"level":"info","message":"FEEDS.md not found or empty, using 2 configured feed(s):","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.367Z"}
+{"level":"info","message":"  - Homegrown Hits Podcast (HGH-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.367Z"}
+{"level":"info","message":"  - Into The Doerfel-Verse Podcast (ITDV-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.367Z"}
+{"level":"info","message":"Checking feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.367Z"}
+{"level":"info","message":"Checking RSS feed for updates: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.368Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.770Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.770Z"}
+{"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.770Z"}
+{"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:37.770Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:53:38.168Z"}
+{"level":"info","message":"Starting daily RSS feed update","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:27.789Z"}
+{"level":"info","message":"Fetching FEEDS.md from target repository...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:27.791Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:28.022Z"}
+{"level":"info","message":"Parsed 11 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:28.023Z"}
+{"level":"info","message":"Found 11 playlist ID(s) in FEEDS.md: b4ts-music-playlist, flowgnar-music-playlist, HGH-music-playlist, IAM-music-playlist, ITDV-music-playlist, MMM-music-playlist, MMT-muic-playlist, SAS-music-playlist, upbeats-music-playlist, Some, Playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:28.023Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:28.339Z"}
+{"level":"info","message":"Discovered 9 playlists with RSS feeds","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.896Z"}
+{"level":"info","message":"Matched 9 playlist(s) from FEEDS.md:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - HGH-music-playlist (Homegrown Hits Music Playlist) -> https://feed.homegrownhits.xyz/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - IAM-music-playlist (It's A Mood music playlist) -> https://itsamood.org/itsamoodrss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - ITDV-music-playlist (ITDV music playlist) -> https://www.doerfelverse.com/feeds/intothedoerfelverse.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - MMM-music-playlist (Mutton, Mead & Music Playlist) -> https://mmmusic-project.ams3.cdn.digitaloceanspaces.com/Mutton_Mead__Music/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - MMT-muic-playlist (Mike's Mix Tape Music Playlist) -> https://mikesmixtape.com/mikesmixtaperss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - SAS-music-playlist (Sats and Sounds Music Playlist) -> https://satsandsounds.com/saspodcast.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.897Z"}
+{"level":"info","message":"  - b4ts-music-playlist (Behind the Sch3m3s Music Playlist) -> https://music.behindthesch3m3s.com/b4ts%20feed/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - flowgnar-music-playlist (Flowgnar Music Playlist) -> https://feeds.oncetold.net/80000060","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - upbeats-music-playlist (UpBeats Music Playlist) -> https://feeds.rssblue.com/upbeats","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"Using 9 feed(s) from FEEDS.md:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Homegrown Hits Podcast (HGH-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - It's A Mood music playlist (IAM-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Into The Doerfel-Verse Podcast (ITDV-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Mutton, Mead & Music Playlist (MMM-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Mike's Mix Tape Music Playlist (MMT-muic-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Sats and Sounds Music Playlist (SAS-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Behind the Sch3m3s Music Playlist (b4ts-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - Flowgnar Music Playlist (flowgnar-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"  - UpBeats Music Playlist (upbeats-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"Checking feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.898Z"}
+{"level":"info","message":"Checking RSS feed for updates: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:29.899Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.303Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.303Z"}
+{"level":"info","message":"Checking feed: It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.303Z"}
+{"level":"info","message":"Checking RSS feed for updates: It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.303Z"}
+{"level":"info","message":"New episode detected in It's A Mood music playlist: Cycles","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.706Z"}
+{"level":"info","message":"New episodes found in It's A Mood music playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.707Z"}
+{"level":"info","message":"Generating playlist from RSS feed: It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.707Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.939Z"}
+{"level":"info","message":"Generated playlist locally: playlists/IAM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:31.940Z"}
+{"level":"info","message":"Successfully updated docs/IAM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.560Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/IAM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.560Z"}
+{"level":"info","message":"Successfully updated playlist: 37 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.561Z"}
+{"level":"info","message":"Latest episode: Cycles","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.561Z"}
+{"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.561Z"}
+{"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.561Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.870Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.871Z"}
+{"level":"info","message":"Checking feed: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.871Z"}
+{"level":"info","message":"Checking RSS feed for updates: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:32.871Z"}
+{"level":"info","message":"New episode detected in Mutton, Mead & Music Playlist: 112th Edition","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:33.191Z"}
+{"level":"info","message":"New episodes found in Mutton, Mead & Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:33.191Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:33.191Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:33.557Z"}
+{"level":"info","message":"Generated playlist locally: playlists/MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:33.558Z"}
+{"level":"info","message":"Successfully updated docs/MMM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.281Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.281Z"}
+{"level":"info","message":"Successfully updated playlist: 112 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.282Z"}
+{"level":"info","message":"Latest episode: 112th Edition","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.282Z"}
+{"level":"info","message":"Checking feed: Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.282Z"}
+{"level":"info","message":"Checking RSS feed for updates: Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.282Z"}
+{"level":"info","message":"New episode detected in Mike's Mix Tape Music Playlist: Volume IX","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.574Z"}
+{"level":"info","message":"New episodes found in Mike's Mix Tape Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.574Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.574Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.856Z"}
+{"level":"info","message":"Generated playlist locally: playlists/MMT-muic-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:34.857Z"}
+{"level":"info","message":"Successfully updated docs/MMT-muic-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/MMT-muic-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"Successfully updated playlist: 9 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"Latest episode: Volume IX","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"Checking feed: Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"Checking RSS feed for updates: Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.464Z"}
+{"level":"info","message":"New episode detected in Sats and Sounds Music Playlist: Episode 100 - 2025-06-30","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.879Z"}
+{"level":"info","message":"New episodes found in Sats and Sounds Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.879Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:35.879Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:36.281Z"}
+{"level":"info","message":"Generated playlist locally: playlists/SAS-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:36.281Z"}
+{"level":"info","message":"Successfully updated docs/SAS-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.092Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/SAS-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.092Z"}
+{"level":"info","message":"Successfully updated playlist: 100 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.093Z"}
+{"level":"info","message":"Latest episode: Episode 100 - 2025-06-30","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.093Z"}
+{"level":"info","message":"Checking feed: Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.093Z"}
+{"level":"info","message":"Checking RSS feed for updates: Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.093Z"}
+{"level":"info","message":"New episode detected in Behind the Sch3m3s Music Playlist: B4TS 03⚡︎09⚡︎2025","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.431Z"}
+{"level":"info","message":"New episodes found in Behind the Sch3m3s Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.431Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.431Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.738Z"}
+{"level":"info","message":"Generated playlist locally: playlists/b4ts-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:37.739Z"}
+{"level":"info","message":"Successfully updated docs/b4ts-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/b4ts-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"Successfully updated playlist: 56 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"Latest episode: B4TS 03⚡︎09⚡︎2025","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"Checking feed: Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"Checking RSS feed for updates: Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.370Z"}
+{"level":"info","message":"New episode detected in Flowgnar Music Playlist: Silent Interludes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.614Z"}
+{"level":"info","message":"New episodes found in Flowgnar Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.615Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.615Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.828Z"}
+{"level":"info","message":"Generated playlist locally: playlists/flowgnar-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:38.828Z"}
+{"level":"info","message":"Successfully updated docs/flowgnar-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/flowgnar-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"Successfully updated playlist: 21 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"Latest episode: Silent Interludes","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"Checking feed: UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"Checking RSS feed for updates: UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.472Z"}
+{"level":"info","message":"New episode detected in UpBeats Music Playlist: 59: Outtatime","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.952Z"}
+{"level":"info","message":"New episodes found in UpBeats Music Playlist, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.952Z"}
+{"level":"info","message":"Generating playlist from RSS feed: UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:39.952Z"}
+{"level":"info","message":"Detected existing playlist format: remoteItem-only","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:40.326Z"}
+{"level":"info","message":"Generated playlist locally: playlists/upbeats-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:40.327Z"}
+{"level":"info","message":"Successfully updated docs/upbeats-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:41.197Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:50.942Z"}
+{"level":"info","message":"Parsed 8 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:50.946Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:58.253Z"}
+{"level":"info","message":"Parsed 9 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:54:58.255Z"}
+{"level":"info","message":"Starting daily RSS feed update","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.529Z"}
+{"level":"info","message":"Fetching FEEDS.md from target repository...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.530Z"}
+{"level":"info","message":"Found FEEDS.md, parsing feed list...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.816Z"}
+{"level":"info","message":"Parsed 9 feed(s) from FEEDS.md","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.817Z"}
+{"level":"info","message":"Found 9 playlist ID(s) in FEEDS.md: b4ts-music-playlist, flowgnar-music-playlist, HGH-music-playlist, IAM-music-playlist, ITDV-music-playlist, MMM-music-playlist, MMT-muic-playlist, SAS-music-playlist, upbeats-music-playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.818Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:29.933Z"}
+{"level":"info","message":"Discovered 9 playlists with RSS feeds","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.321Z"}
+{"level":"info","message":"Matched 9 playlist(s) from FEEDS.md:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.322Z"}
+{"level":"info","message":"  - HGH-music-playlist (Homegrown Hits Music Playlist) -> https://feed.homegrownhits.xyz/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.322Z"}
+{"level":"info","message":"  - IAM-music-playlist (It's A Mood music playlist) -> https://itsamood.org/itsamoodrss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - ITDV-music-playlist (ITDV music playlist) -> https://www.doerfelverse.com/feeds/intothedoerfelverse.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - MMM-music-playlist (Mutton, Mead & Music Playlist) -> https://mmmusic-project.ams3.cdn.digitaloceanspaces.com/Mutton_Mead__Music/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - MMT-muic-playlist (Mike's Mix Tape Music Playlist) -> https://mikesmixtape.com/mikesmixtaperss.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - SAS-music-playlist (Sats and Sounds Music Playlist) -> https://satsandsounds.com/saspodcast.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - b4ts-music-playlist (Behind the Sch3m3s Music Playlist) -> https://music.behindthesch3m3s.com/b4ts%20feed/feed.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - flowgnar-music-playlist (Flowgnar Music Playlist) -> https://feeds.oncetold.net/80000060","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"  - upbeats-music-playlist (UpBeats Music Playlist) -> https://feeds.rssblue.com/upbeats","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.323Z"}
+{"level":"info","message":"Using 9 feed(s) from FEEDS.md:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Homegrown Hits Podcast (HGH-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - It's A Mood music playlist (IAM-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Into The Doerfel-Verse Podcast (ITDV-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Mutton, Mead & Music Playlist (MMM-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Mike's Mix Tape Music Playlist (MMT-muic-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Sats and Sounds Music Playlist (SAS-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Behind the Sch3m3s Music Playlist (b4ts-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - Flowgnar Music Playlist (flowgnar-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"  - UpBeats Music Playlist (upbeats-music-playlist)","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"Checking feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"Checking RSS feed for updates: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.324Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.915Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.915Z"}
+{"level":"info","message":"Checking feed: It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.915Z"}
+{"level":"info","message":"Checking RSS feed for updates: It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:31.915Z"}
+{"level":"info","message":"No new episodes in It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.372Z"}
+{"level":"info","message":"No new episodes in It's A Mood music playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.372Z"}
+{"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.372Z"}
+{"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.372Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.719Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.719Z"}
+{"level":"info","message":"Checking feed: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.719Z"}
+{"level":"info","message":"Checking RSS feed for updates: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:32.719Z"}
+{"level":"info","message":"No new episodes in Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.047Z"}
+{"level":"info","message":"No new episodes in Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.047Z"}
+{"level":"info","message":"Checking feed: Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.047Z"}
+{"level":"info","message":"Checking RSS feed for updates: Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.047Z"}
+{"level":"info","message":"No new episodes in Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.343Z"}
+{"level":"info","message":"No new episodes in Mike's Mix Tape Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.344Z"}
+{"level":"info","message":"Checking feed: Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.344Z"}
+{"level":"info","message":"Checking RSS feed for updates: Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.344Z"}
+{"level":"info","message":"No new episodes in Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.776Z"}
+{"level":"info","message":"No new episodes in Sats and Sounds Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.776Z"}
+{"level":"info","message":"Checking feed: Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.776Z"}
+{"level":"info","message":"Checking RSS feed for updates: Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:33.776Z"}
+{"level":"info","message":"No new episodes in Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.188Z"}
+{"level":"info","message":"No new episodes in Behind the Sch3m3s Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.188Z"}
+{"level":"info","message":"Checking feed: Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.188Z"}
+{"level":"info","message":"Checking RSS feed for updates: Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.188Z"}
+{"level":"info","message":"No new episodes in Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.454Z"}
+{"level":"info","message":"No new episodes in Flowgnar Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.454Z"}
+{"level":"info","message":"Checking feed: UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.454Z"}
+{"level":"info","message":"Checking RSS feed for updates: UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.454Z"}
+{"level":"info","message":"No new episodes in UpBeats Music Playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:34.920Z"}
+{"level":"info","message":"Restoring playlists from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.431Z"}
+{"level":"info","message":"Target repository: ChadFarrow/chadf-musicl-playlists","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.433Z"}
+{"level":"info","message":"Fetching playlist files from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0...","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.433Z"}
+{"level":"info","message":"Found 10 XML files in docs","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.620Z"}
+{"level":"info","message":"Found 10 playlist file(s) to restore:","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.620Z"}
+{"level":"info","message":"  - HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - IAM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - MMT-muic-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - SAS-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - b4ts-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - chadf-musicl-publisher.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - flowgnar-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"  - upbeats-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:37.621Z"}
+{"level":"info","message":"Successfully updated docs/HGH-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:38.718Z"}
+{"level":"info","message":"Restored docs/HGH-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:38.719Z"}
+{"level":"info","message":"Successfully updated docs/IAM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:39.720Z"}
+{"level":"info","message":"Restored docs/IAM-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:39.720Z"}
+{"level":"info","message":"Successfully updated docs/ITDV-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:40.551Z"}
+{"level":"info","message":"Restored docs/ITDV-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:40.551Z"}
+{"level":"info","message":"Successfully updated docs/MMM-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:41.708Z"}
+{"level":"info","message":"Restored docs/MMM-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:41.708Z"}
+{"level":"info","message":"Successfully updated docs/MMT-muic-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:42.607Z"}
+{"level":"info","message":"Restored docs/MMT-muic-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:42.607Z"}
+{"level":"info","message":"Successfully updated docs/SAS-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:43.528Z"}
+{"level":"info","message":"Restored docs/SAS-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:43.529Z"}
+{"level":"info","message":"Successfully updated docs/b4ts-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:44.453Z"}
+{"level":"info","message":"Restored docs/b4ts-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:44.453Z"}
+{"level":"info","message":"Successfully updated docs/chadf-musicl-publisher.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:45.271Z"}
+{"level":"info","message":"Restored docs/chadf-musicl-publisher.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:45.271Z"}
+{"level":"info","message":"Successfully updated docs/flowgnar-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:46.143Z"}
+{"level":"info","message":"Restored docs/flowgnar-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:46.143Z"}
+{"level":"info","message":"Successfully updated docs/upbeats-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:47.113Z"}

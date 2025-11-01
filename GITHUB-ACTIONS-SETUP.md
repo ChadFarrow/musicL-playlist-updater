@@ -5,11 +5,23 @@ This guide explains how to set up and use the GitHub Actions workflow for automa
 ## Overview
 
 The GitHub Actions workflow automatically:
-1. Checks all configured RSS feeds for new episodes
-2. Updates playlists with new tracks
-3. Commits and pushes changes to your repository
+1. **Reads FEEDS.md** from the target repository (`chadf-musicl-playlists/FEEDS.md`) to determine which feeds to update
+2. **Discovers playlists** matching the IDs in FEEDS.md from `chadf-musicl-playlists/docs/`
+3. **Extracts RSS feed URLs** from each playlist's XML (`<podcast:txt purpose="source-feed">` tags)
+4. Checks all RSS feeds for new episodes
+5. Updates playlists with new tracks
+6. **Syncs updated playlists** directly to the target repository (`chadf-musicl-playlists/docs/`) via GitHub API
+7. Only commits configuration changes (`src/config/feeds.json`) to the updater repository
 
 The workflow runs **once per day at midnight UTC** and can also be triggered manually.
+
+### FEEDS.md Feature
+
+The workflow reads `FEEDS.md` from the target repository to determine which feeds should be updated:
+- **FEEDS.md is the source of truth** - Lists all playlist IDs that should be updated
+- **Auto-discovery** - Workflow discovers playlists in `docs/` and matches them to FEEDS.md entries
+- **Automatic RSS extraction** - Each playlist's source RSS feed is extracted from its XML
+- **Fallback to feeds.json** - If FEEDS.md is not found, falls back to configured feeds in `feeds.json`
 
 ## Prerequisites
 
@@ -21,7 +33,9 @@ The workflow runs **once per day at midnight UTC** and can also be triggered man
 
 ### Step 1: Add GitHub Token Secret
 
-You need to create a Personal Access Token (PAT) with repository write permissions.
+You need to create a Personal Access Token (PAT) with repository write permissions for **both repositories**:
+- The updater repository (`musicL-playlist-updater`) - for committing config changes
+- The target repository (`chadf-musicl-playlists`) - for syncing playlist files
 
 1. **Create a Personal Access Token:**
    - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
@@ -32,31 +46,58 @@ You need to create a Personal Access Token (PAT) with repository write permissio
    - **Copy the token immediately** (you won't be able to see it again)
 
 2. **Add the token as a repository secret:**
-   - Go to your repository: `https://github.com/ChadFarrow/chadf-musicl-playlists`
+   - Go to your **updater** repository: `https://github.com/ChadFarrow/musicL-playlist-updater`
    - Navigate to: Settings → Secrets and variables → Actions
    - Click "New repository secret"
    - Name: `TOKEN` (Note: `GITHUB_TOKEN` is reserved by GitHub, so use `TOKEN` instead)
    - Value: Paste your Personal Access Token
    - Click "Add secret"
+   - **Important**: The same token will be used to access both repositories. Ensure it has write access to `chadf-musicl-playlists`.
 
-### Step 2: Verify Configuration
+### Step 2: Configure Feeds in FEEDS.md
 
-Ensure your `src/config/feeds.json` has RSS feeds configured with:
-- `enabled: true` for feeds you want to monitor
-- Valid `rssUrl` for each feed
-- Proper `playlistId` and metadata
+**Important**: The workflow reads `FEEDS.md` from the target repository (`chadf-musicl-playlists/FEEDS.md`) to determine which feeds to update. The workflow will:
 
-Example:
+1. Read `FEEDS.md` from the target repository
+2. Parse playlist IDs from the file (supports various markdown formats: bullet lists, numbered lists, tables, etc.)
+3. Discover matching playlists in `chadf-musicl-playlists/docs/`
+4. Extract RSS feed URLs from each playlist's XML
+5. Update all discovered feeds
+
+**To add a feed for automatic updates:**
+
+1. Edit `FEEDS.md` in the `chadf-musicl-playlists` repository
+2. Add the playlist ID (without `.xml` extension) in any of these formats:
+   - Bullet list: `- HGH-music-playlist`
+   - Numbered list: `1. ITDV-music-playlist`
+   - Table row: `| HGH-music-playlist | ... |`
+   - Plain text: `HGH-music-playlist`
+
+3. Ensure the corresponding playlist XML file exists in `docs/` with a valid `<podcast:txt purpose="source-feed">` tag
+
+**Note**: You can also configure feeds manually in `src/config/feeds.json` for custom settings (check intervals, enabled/disabled, etc.). The workflow will use FEEDS.md first, then fall back to `feeds.json` if FEEDS.md is unavailable.
+
+**Example FEEDS.md format:**
+```markdown
+# Feeds to Update
+
+- HGH-music-playlist
+- ITDV-music-playlist
+- IAM-music-playlist
+- MMM-music-playlist
+```
+
+**Example feeds.json (for custom settings):**
 ```json
 {
   "rssFeeds": [
     {
       "id": "homegrown-hits-feed",
       "name": "Homegrown Hits Podcast",
-      "rssUrl": "https://feed.homegrownhits.xyz/feed.xml",
       "playlistId": "HGH-music-playlist",
       "enabled": true,
-      ...
+      "checkIntervalMinutes": 1440
+      // RSS URL and metadata will be auto-discovered from playlist XML
     }
   ]
 }
@@ -95,14 +136,18 @@ You can also trigger the workflow manually:
 
 ### Workflow Steps
 
-1. **Checkout repository** - Gets the latest code
+1. **Checkout repository** - Gets the latest code from the updater repository
 2. **Setup Node.js** - Installs Node.js 18 and caches npm dependencies
 3. **Install dependencies** - Runs `npm ci` to install packages
 4. **Run daily feed update** - Executes `scripts/daily-update.js`
-   - Checks all enabled RSS feeds
+   - **Fetches FEEDS.md** from target repository to get list of playlist IDs
+   - **Discovers playlists** in `docs/` matching FEEDS.md entries
+   - **Extracts RSS feed URLs** from each playlist's XML
+   - Checks all RSS feeds for new episodes
    - Generates playlists for feeds with new episodes
-   - Syncs updated playlists to GitHub
-5. **Commit and push changes** - If any playlists were updated, commits and pushes them to the repository
+   - **Syncs updated playlists directly** to `chadf-musicl-playlists/docs/{playlistId}.xml` via GitHub API
+5. **Commit and push changes** - Only commits `src/config/feeds.json` changes (if any) to the updater repository
+   - **Note**: Playlist files are NOT committed to the updater repo - they're synced directly to the target repo
 
 ## Monitoring Workflow Runs
 
@@ -150,13 +195,22 @@ You can also trigger the workflow manually:
 
 ### No Updates Found
 
-**Problem**: Workflow runs but no changes are committed
+**Problem**: Workflow runs but no changes are committed or synced
 
 **Possible reasons**:
 - No new episodes in RSS feeds (check feed URLs manually)
-- Feeds are disabled in `src/config/feeds.json`
 - Episodes haven't changed since last check
+- **Playlist discovery failed** - Check if token has read access to `chadf-musicl-playlists`
+- **Sync to target repo failed** - Check if token has write access to `chadf-musicl-playlists`
+- **No feeds found** - Add playlist IDs to `FEEDS.md` in the target repository or configure feeds in `src/config/feeds.json`
 - This is normal behavior when feeds are up-to-date
+
+**Note**: Check the logs for:
+- "Found X playlist ID(s) in FEEDS.md" - Shows which feeds were parsed from FEEDS.md
+- "Using X feed(s) from FEEDS.md" - Shows which feeds will be updated
+- "FEEDS.md not found or empty, using X configured feed(s)" - Falls back to feeds.json
+- "No new episodes in [feed name]" - Feed checked but no updates found
+- Any errors during feed checks or sync
 
 ### Feed Check Failures
 
@@ -191,9 +245,9 @@ node scripts/daily-update.js
 ```
 
 This will:
-- Check all enabled RSS feeds
+- Check all configured RSS feeds (from `feeds.json` with `enabled: true`)
 - Update playlists locally
-- Sync to GitHub (if token is set)
+- Sync updated playlists to `chadf-musicl-playlists/docs/` (if token is set)
 - Show detailed logs
 
 ## Configuration Files
@@ -209,11 +263,21 @@ The workflow uses these configuration files:
 The workflow automatically sets:
 - `GITHUB_TOKEN`: Mapped from `TOKEN` repository secret (for API access)
   - Note: The secret is named `TOKEN` because `GITHUB_TOKEN` is reserved by GitHub Actions
+  - This token needs **write access** to `chadf-musicl-playlists` repository for syncing playlists
+  - This token needs **write access** to `musicL-playlist-updater` repository for committing config changes
 - `NODE_ENV`: Production mode
 
 The update script checks:
 - `process.env.GITHUB_TOKEN`: First priority for GitHub token (set by workflow from `TOKEN` secret)
 - `config.json`: Fallback for GitHub token
+
+## How Playlists Are Synced
+
+Playlists are synced to the target repository via GitHub API (not git commits):
+1. Playlists are generated locally during workflow execution
+2. Each updated playlist is uploaded directly to `chadf-musicl-playlists/docs/{playlistId}.xml` via GitHub API
+3. Only `src/config/feeds.json` changes are committed to the updater repository
+4. This means playlist files don't appear in the updater repo's commit history - they're only in the target repo
 
 ## Best Practices
 
