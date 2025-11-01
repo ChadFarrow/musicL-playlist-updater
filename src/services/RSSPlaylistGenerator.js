@@ -19,6 +19,14 @@ export class RSSPlaylistGenerator {
       }
     });
     this.githubSync = null;
+    this.podping = null;
+  }
+
+  async initializePodPing() {
+    if (this.config.podping?.enabled && !this.podping) {
+      const { PodPing } = await import('./PodPing.js');
+      this.podping = new PodPing(this.config.podping);
+    }
   }
 
   async initializeGitHubSync() {
@@ -355,6 +363,24 @@ export class RSSPlaylistGenerator {
             const githubPath = `docs/${feedConfig.playlistId}.xml`;
             await this.githubSync.updateFile(githubPath, playlistXML, `Auto-update playlist from ${feedConfig.name} RSS feed - Added ${newEpisodes.length} new episode(s)`);
             logger.info(`Synced playlist to GitHub: ${githubPath}`);
+            
+            // Send PodPing notification after successful GitHub sync
+            if (this.config.podping?.enabled && feedConfig.rssUrl) {
+              try {
+                await this.initializePodPing();
+                if (this.podping) {
+                  const podpingResult = await this.podping.sendNotification(feedConfig.rssUrl);
+                  if (podpingResult.success) {
+                    logger.info(`PodPing notification sent for ${feedConfig.name}`);
+                  } else {
+                    logger.warn(`PodPing notification failed for ${feedConfig.name}: ${podpingResult.message}`);
+                  }
+                }
+              } catch (podpingError) {
+                // Non-fatal error - log warning but don't fail the update
+                logger.warn(`Failed to send PodPing notification for ${feedConfig.name}: ${podpingError.message}`);
+              }
+            }
           }
         } catch (error) {
           logger.error(`Failed to sync playlist to GitHub:`, error);

@@ -37,6 +37,13 @@ const fullConfig = {
   githubRepoBranch: config.github?.repoBranch || 'main',
   enableGitHubSync: config.github?.enableSync !== false,
   
+  // PodPing settings
+  podping: config.podping || {
+    enabled: false,
+    endpoint: 'https://podping.cloud',
+    timeout: 5000
+  },
+  
   // Logging
   logLevel: config.logging?.level || 'info'
 };
