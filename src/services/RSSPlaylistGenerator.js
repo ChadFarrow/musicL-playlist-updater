@@ -107,124 +107,126 @@ export class RSSPlaylistGenerator {
       const newEpisodes = [];
       const existingEpisodes = [];
       
-      // Process RSS feed episodes in order (newest first) - matching Auto-musicL-Maker
-      for (const episode of feed.items) {
-        try {
-          const episodeGuid = episode.guid || episode.link;
-          
-          if (!episodeGuid) {
-            logger.warn(`Skipping episode without GUID: ${episode.title || 'Unknown'}`);
+      // Extract ALL feedGuid/itemGuid pairs from RSS feed in exact order (newest episode first, then by startTime)
+      // This ensures the playlist matches the exact order they appear in the RSS feed
+      if (rssXml) {
+        // Extract all valueTimeSplit pairs from entire RSS feed, preserving order
+        const allPairs = [];
+        const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*startTime=["']([^"']+)["'][^>]*>[\s\S]*?<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
+        let match;
+        while ((match = valueTimeSplitRegex.exec(rssXml)) !== null) {
+          try {
+            const startTime = parseFloat(match[1]) || 0;
+            const pairFeedGuid = match[2];
+            const pairItemGuid = match[3];
+            
+            if (pairFeedGuid && pairItemGuid) {
+              // Determine which episode this belongs to by finding the nearest <item> tag
+              const matchIndex = match.index;
+              // Find the episode GUID by looking backwards for the most recent <item><guid> tag
+              const beforeMatch = rssXml.substring(0, matchIndex);
+              const itemMatch = beforeMatch.match(/<item[^>]*>[\s\S]*?<guid[^>]*>([^<]+)<\/guid>/gi);
+              let episodeGuid = null;
+              let episodeIndex = -1;
+              
+              if (itemMatch && itemMatch.length > 0) {
+                const lastItem = itemMatch[itemMatch.length - 1];
+                const guidMatch = lastItem.match(/<guid[^>]*>([^<]+)<\/guid>/i);
+                if (guidMatch) {
+                  episodeGuid = guidMatch[1].trim();
+                  // Find episode index in feed.items
+                  episodeIndex = feed.items.findIndex(ep => (ep.guid || ep.link) === episodeGuid);
+                  if (episodeIndex === -1) episodeIndex = feed.items.length; // If not found, put at end
+                }
+              }
+              
+              allPairs.push({
+                feedGuid: pairFeedGuid,
+                itemGuid: pairItemGuid,
+                startTime: startTime,
+                episodeIndex: episodeIndex,
+                episodeGuid: episodeGuid,
+                matchIndex: matchIndex
+              });
+            }
+          } catch (pairError) {
+            logger.debug(`Error processing valueTimeSplit pair:`, pairError);
             continue;
           }
-          
-          // Extract feedGuid/itemGuid pairs from this episode's RSS XML content
-          if (rssXml) {
-            try {
-              // Find this episode's item section in the RSS XML
-              const episodeGuidPattern = episodeGuid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-              const episodeItemRegex = new RegExp(`<item[^>]*>[\\s\\S]*?<guid[^>]*>${episodeGuidPattern}[\\s\\S]*?</item>`, 'i');
-              const episodeMatch = rssXml.match(episodeItemRegex);
-              
-              if (episodeMatch && episodeMatch[0]) {
-                const episodeContent = episodeMatch[0];
-                
-                // Extract feedGuid/itemGuid pairs from valueTimeSplit tags in this episode (in order)
-                try {
-                  const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*>[\s\S]*?<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
-                  let match;
-                  while ((match = valueTimeSplitRegex.exec(episodeContent)) !== null) {
-                    try {
-                      const pairFeedGuid = match[1];
-                      const pairItemGuid = match[2];
-                      
-                      if (!pairFeedGuid || !pairItemGuid) {
-                        logger.debug(`Skipping invalid pair in episode ${episodeGuid}`);
-                        continue;
-                      }
-                      
-                      if (!addedItemGuids.has(pairItemGuid)) {
-                        // Check if this item exists in playlist
-                        const existingItem = existingItemsMap.get(pairItemGuid);
-                        if (existingItem) {
-                          // Use existing XML to preserve formatting
-                          let normalizedXml = existingItem.xml.trim();
-                          if (!normalizedXml.includes('feedGuid')) {
-                            normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
-                          } else {
-                            normalizedXml = `      ${normalizedXml}`;
-                          }
-                          allRemoteItems.push(normalizedXml);
-                          addedItemGuids.add(pairItemGuid);
-                          existingEpisodes.push(pairItemGuid);
-                        } else {
-                          // New track from RSS feed
-                          allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
-                          addedItemGuids.add(pairItemGuid);
-                          newEpisodes.push(pairItemGuid);
-                        }
-                      }
-                    } catch (pairError) {
-                      logger.debug(`Error processing pair in episode ${episodeGuid}:`, pairError);
-                      continue;
-                    }
-                  }
-                } catch (regexError) {
-                  logger.debug(`Error extracting valueTimeSplit pairs from episode ${episodeGuid}:`, regexError);
-                }
-                
-                // Also extract standalone remoteItem tags from this episode
-                try {
-                  const remoteItemRegex = /<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
-                  let match;
-                  while ((match = remoteItemRegex.exec(episodeContent)) !== null) {
-                    try {
-                      const pairFeedGuid = match[1];
-                      const pairItemGuid = match[2];
-                      
-                      if (!pairFeedGuid || !pairItemGuid) {
-                        continue;
-                      }
-                      
-                      // Skip if already added from valueTimeSplit
-                      if (!addedItemGuids.has(pairItemGuid)) {
-                        const existingItem = existingItemsMap.get(pairItemGuid);
-                        if (existingItem) {
-                          let normalizedXml = existingItem.xml.trim();
-                          if (!normalizedXml.includes('feedGuid')) {
-                            normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
-                          } else {
-                            normalizedXml = `      ${normalizedXml}`;
-                          }
-                          allRemoteItems.push(normalizedXml);
-                          addedItemGuids.add(pairItemGuid);
-                          existingEpisodes.push(pairItemGuid);
-                        } else {
-                          allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
-                          addedItemGuids.add(pairItemGuid);
-                          newEpisodes.push(pairItemGuid);
-                        }
-                      }
-                    } catch (pairError) {
-                      logger.debug(`Error processing standalone remoteItem in episode ${episodeGuid}:`, pairError);
-                      continue;
-                    }
-                  }
-                } catch (regexError) {
-                  logger.debug(`Error extracting standalone remoteItems from episode ${episodeGuid}:`, regexError);
-                }
+        }
+        
+        // Sort pairs: by episode index (newest first), then by startTime within each episode
+        allPairs.sort((a, b) => {
+          if (a.episodeIndex !== b.episodeIndex) {
+            return a.episodeIndex - b.episodeIndex; // Lower index = newer episode
+          }
+          return a.startTime - b.startTime; // Within same episode, sort by startTime
+        });
+        
+        // Process pairs in sorted order
+        for (const pair of allPairs) {
+          if (!addedItemGuids.has(pair.itemGuid)) {
+            // Check if this item exists in playlist
+            const existingItem = existingItemsMap.get(pair.itemGuid);
+            if (existingItem) {
+              // Use existing XML to preserve formatting
+              let normalizedXml = existingItem.xml.trim();
+              if (!normalizedXml.includes('feedGuid')) {
+                normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
               } else {
-                logger.debug(`Could not find episode content in RSS XML for GUID: ${episodeGuid}`);
+                normalizedXml = `      ${normalizedXml}`;
               }
-            } catch (episodeError) {
-              logger.debug(`Error processing episode ${episodeGuid}:`, episodeError);
+              allRemoteItems.push(normalizedXml);
+              addedItemGuids.add(pair.itemGuid);
+              existingEpisodes.push(pair.itemGuid);
+            } else {
+              // New track from RSS feed
+              allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pair.feedGuid}" itemGuid="${pair.itemGuid}"/>`);
+              addedItemGuids.add(pair.itemGuid);
+              newEpisodes.push(pair.itemGuid);
+            }
+          }
+        }
+        
+        logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (ordered by episode and startTime)`);
+      }
+      
+      // Also extract standalone remoteItem tags from RSS feed (if any)
+      if (rssXml) {
+        const remoteItemRegex = /<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
+        let match;
+        while ((match = remoteItemRegex.exec(rssXml)) !== null) {
+          try {
+            const pairFeedGuid = match[1];
+            const pairItemGuid = match[2];
+            
+            if (!pairFeedGuid || !pairItemGuid) {
               continue;
             }
-          } else {
-            logger.debug(`No RSS XML available, skipping extraction for episode ${episodeGuid}`);
+            
+            // Skip if already added from valueTimeSplit
+            if (!addedItemGuids.has(pairItemGuid)) {
+              const existingItem = existingItemsMap.get(pairItemGuid);
+              if (existingItem) {
+                let normalizedXml = existingItem.xml.trim();
+                if (!normalizedXml.includes('feedGuid')) {
+                  normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
+                } else {
+                  normalizedXml = `      ${normalizedXml}`;
+                }
+                allRemoteItems.push(normalizedXml);
+                addedItemGuids.add(pairItemGuid);
+                existingEpisodes.push(pairItemGuid);
+              } else {
+                allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
+                addedItemGuids.add(pairItemGuid);
+                newEpisodes.push(pairItemGuid);
+              }
+            }
+          } catch (pairError) {
+            logger.debug(`Error processing standalone remoteItem:`, pairError);
+            continue;
           }
-        } catch (error) {
-          logger.error(`Error processing episode:`, error);
-          continue;
         }
       }
       
