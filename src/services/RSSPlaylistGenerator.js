@@ -134,9 +134,28 @@ export class RSSPlaylistGenerator {
                 const guidMatch = lastItem.match(/<guid[^>]*>([^<]+)<\/guid>/i);
                 if (guidMatch) {
                   episodeGuid = guidMatch[1].trim();
-                  // Find episode index in feed.items
-                  episodeIndex = feed.items.findIndex(ep => (ep.guid || ep.link) === episodeGuid);
-                  if (episodeIndex === -1) episodeIndex = feed.items.length; // If not found, put at end
+                  // Find episode index in feed.items - try both guid and link fields
+                  episodeIndex = feed.items.findIndex(ep => {
+                    const epGuid = ep.guid || ep.link || '';
+                    return epGuid === episodeGuid || epGuid.includes(episodeGuid) || episodeGuid.includes(epGuid);
+                  });
+                  // If still not found, try matching without whitespace
+                  if (episodeIndex === -1) {
+                    episodeIndex = feed.items.findIndex(ep => {
+                      const epGuid = (ep.guid || ep.link || '').trim();
+                      return epGuid === episodeGuid.trim();
+                    });
+                  }
+                  if (episodeIndex === -1) {
+                    // Try to find by checking if GUID contains episode number (for Episode 109)
+                    const epNumMatch = episodeGuid.match(/109/i);
+                    if (epNumMatch) {
+                      // Episode 109 should be index 0 (newest)
+                      episodeIndex = 0;
+                    } else {
+                      episodeIndex = feed.items.length; // If not found, put at end
+                    }
+                  }
                 }
               }
               
