@@ -126,7 +126,18 @@ export class Scheduler {
 
   getCronExpression(minutes) {
     // Convert minutes to cron expression
-    // For simplicity, we'll check every X minutes
+    // For daily checks (1440 minutes = 1 day), use midnight UTC
+    if (minutes >= 1440) {
+      return '0 0 * * *'; // Daily at midnight UTC
+    }
+    
+    // For hourly checks (>= 60 minutes), use hourly at minute 0
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      return `0 */${hours} * * *`;
+    }
+    
+    // For minute-based checks (1-59 minutes)
     if (minutes < 1) minutes = 1;
     if (minutes > 59) minutes = 59;
     

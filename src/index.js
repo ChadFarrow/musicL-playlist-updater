@@ -37,8 +37,8 @@ class MusicLPlaylistUpdater {
       maxRetries: config.monitoring?.maxRetries || 3,
       retryDelayMs: config.monitoring?.retryDelayMs || 5000,
       
-      // GitHub settings
-      githubToken: config.github?.token,
+      // GitHub settings - check environment variable first, then config
+      githubToken: process.env.GITHUB_TOKEN || config.github?.token,
       githubRepoOwner: config.github?.repoOwner || 'ChadFarrow',
       githubRepoName: config.github?.repoName || 'chadf-musicl-playlists',
       githubRepoBranch: config.github?.repoBranch || 'main',

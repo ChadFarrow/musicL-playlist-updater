@@ -7,7 +7,7 @@
     "enableSync": true
   },
   "monitoring": {
-    "checkIntervalMinutes": 5,
+    "checkIntervalMinutes": 1440,
     "maxRetries": 3,
     "retryDelayMs": 5000
   },

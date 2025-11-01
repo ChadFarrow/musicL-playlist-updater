@@ -12,7 +12,7 @@
       "enabled": true,
       "lastChecked": null,
       "lastEpisodeGuid": null,
-      "checkIntervalMinutes": 5
+      "checkIntervalMinutes": 1440
     },
     {
       "id": "into-doerfelverse-feed",
@@ -26,12 +26,12 @@
       "enabled": true,
       "lastChecked": null,
       "lastEpisodeGuid": null,
-      "checkIntervalMinutes": 5
+      "checkIntervalMinutes": 1440
     }
   ],
   "playlists": [],
   "settings": {
-    "defaultCheckInterval": 5,
+    "defaultCheckInterval": 1440,
     "maxRetries": 3,
     "retryDelayMs": 5000,
     "enableGitHubSync": true,
