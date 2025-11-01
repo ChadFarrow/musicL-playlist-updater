@@ -33,3 +33,22 @@
 {"level":"info","message":"Generated playlist locally: playlists/test-position.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:46:52.783Z"}
 {"level":"info","message":"Generating playlist from RSS feed: ITDV-music-playlist Feed","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:51:45.498Z"}
 {"level":"info","message":"Generated playlist locally: playlists/ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-09-05T21:51:45.920Z"}
+{"level":"info","message":"Starting daily RSS feed update","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:13.945Z"}
+{"level":"info","message":"Checking 2 enabled RSS feed(s)","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:13.950Z"}
+{"level":"info","message":"Checking feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:13.950Z"}
+{"level":"info","message":"Checking RSS feed for updates: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:13.951Z"}
+{"level":"info","message":"New episode detected in Homegrown Hits Podcast: Homegrown Hits - Episode 108","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:14.809Z"}
+{"level":"info","message":"New episodes found in Homegrown Hits Podcast, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:14.809Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:14.810Z"}
+{"level":"info","message":"Generated playlist locally: playlists/HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:15.498Z"}
+{"level":"info","message":"Successfully updated docs/HGH-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.004Z"}
+{"level":"info","message":"Synced playlist to GitHub: docs/HGH-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.005Z"}
+{"level":"info","message":"Successfully updated playlist: 109 episodes","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.005Z"}
+{"level":"info","message":"Latest episode: Homegrown Hits - Episode 108","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.005Z"}
+{"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.005Z"}
+{"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.006Z"}
+{"level":"info","message":"New episode detected in Into The Doerfel-Verse Podcast: Episode 61 - Peepal","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.482Z"}
+{"level":"info","message":"New episodes found in Into The Doerfel-Verse Podcast, generating playlist","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.483Z"}
+{"level":"info","message":"Generating playlist from RSS feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.483Z"}
+{"level":"info","message":"Generated playlist locally: playlists/ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.969Z"}
+{"level":"info","message":"Successfully updated docs/ITDV-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:19.316Z"}
