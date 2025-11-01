@@ -47,8 +47,8 @@ const fullConfig = {
   // PodPing settings - check environment variables first, then config
   podping: {
     enabled: config.podping?.enabled !== false,
-    endpoint: config.podping?.endpoint || 'https://podping.cloud',
-    timeout: config.podping?.timeout || 5000,
+    timeout: config.podping?.timeout || 10000,
+    hiveNode: config.podping?.hiveNode || 'https://api.hive.blog',
     hiveUsername: process.env.HIVE_USERNAME || config.podping?.hiveUsername || '',
     hivePostingKey: process.env.HIVE_POSTING_KEY || config.podping?.hivePostingKey || ''
   },

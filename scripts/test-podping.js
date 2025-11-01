@@ -22,17 +22,17 @@ try {
 // Build PodPing configuration
 const podpingConfig = {
   enabled: config.podping?.enabled !== false,
-  endpoint: config.podping?.endpoint || 'https://podping.cloud',
-  timeout: config.podping?.timeout || 5000,
+  timeout: config.podping?.timeout || 10000,
   hiveUsername: process.env.HIVE_USERNAME || config.podping?.hiveUsername || '',
-  hivePostingKey: process.env.HIVE_POSTING_KEY || config.podping?.hivePostingKey || ''
+  hivePostingKey: process.env.HIVE_POSTING_KEY || config.podping?.hivePostingKey || '',
+  hiveNode: config.podping?.hiveNode || 'https://api.hive.blog'
 };
 
 // Test feed URL - you can change this to any feed URL you want to test
 const testFeedUrl = process.argv[2] || 'https://feed.homegrownhits.xyz/feed.xml';
 
 logger.info('=== PodPing Test Script ===');
-logger.info(`Endpoint: ${podpingConfig.endpoint}`);
+logger.info(`Hive Node: ${podpingConfig.hiveNode}`);
 logger.info(`Hive Username: ${podpingConfig.hiveUsername ? podpingConfig.hiveUsername.substring(0, 3) + '***' : 'NOT SET'}`);
 logger.info(`Hive Posting Key: ${podpingConfig.hivePostingKey ? podpingConfig.hivePostingKey.substring(0, 5) + '***' : 'NOT SET'}`);
 logger.info(`Test Feed URL: ${testFeedUrl}`);

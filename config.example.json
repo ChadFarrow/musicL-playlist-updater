@@ -20,8 +20,8 @@
   },
   "podping": {
     "enabled": true,
-    "endpoint": "https://podping.cloud",
-    "timeout": 5000,
+    "timeout": 10000,
+    "hiveNode": "https://api.hive.blog",
     "hiveUsername": "",
     "hivePostingKey": ""
   },
