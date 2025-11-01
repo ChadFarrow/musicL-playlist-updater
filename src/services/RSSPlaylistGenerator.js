@@ -153,8 +153,26 @@ export class RSSPlaylistGenerator {
                       // Episode 109 should be index 0 (newest)
                       episodeIndex = 0;
                     } else {
-                      episodeIndex = feed.items.length; // If not found, put at end
+                      // For HGH, try to match episode GUID by finding similar patterns
+                      // Check feed.items titles for episode numbers
+                      const epTitleMatch = feed.items.findIndex(ep => {
+                        const title = (ep.title || '').toLowerCase();
+                        if (episodeGuid.includes('homegrownhits-109') || episodeGuid.includes('109')) {
+                          return title.includes('109');
+                        }
+                        return false;
+                      });
+                      if (epTitleMatch >= 0) {
+                        episodeIndex = epTitleMatch;
+                      } else {
+                        episodeIndex = feed.items.length; // If not found, put at end
+                      }
                     }
+                  }
+                  
+                  // Log if episode not found for debugging HGH
+                  if (episodeIndex === feed.items.length && episodeGuid) {
+                    logger.debug(`Could not find episode index for GUID: ${episodeGuid}. Feed has ${feed.items.length} episodes.`);
                   }
                 }
               }
@@ -193,6 +211,14 @@ export class RSSPlaylistGenerator {
         });
         
         logger.info(`Extracted ${allPairs.length} pairs from RSS feed. First 5 itemGuids: ${allPairs.slice(0, 5).map(p => p.itemGuid).join(', ')}`);
+        logger.info(`Episode index distribution: ${Array.from(new Set(allPairs.map(p => p.episodeIndex))).sort((a,b) => a-b).slice(0, 10).join(', ')}`);
+        
+        // Log first 13 pairs with their episode info for debugging
+        if (allPairs.length >= 13) {
+          const first13 = allPairs.slice(0, 13);
+          logger.debug(`First 13 pairs - Episode indices: ${first13.map(p => p.episodeIndex).join(', ')}`);
+          logger.debug(`First 13 pairs - Start times: ${first13.map(p => p.startTime).join(', ')}`);
+        }
         
         // Process pairs in sorted order
         for (const pair of allPairs) {
