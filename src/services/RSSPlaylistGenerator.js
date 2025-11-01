@@ -221,6 +221,33 @@ export class RSSPlaylistGenerator {
         logger.info(`Extracted ${allPairs.length} pairs from RSS feed. First 5 itemGuids: ${allPairs.slice(0, 5).map(p => p.itemGuid).join(', ')}`);
         logger.info(`Episode index distribution: ${Array.from(new Set(allPairs.map(p => p.episodeIndex))).sort((a,b) => a-b).slice(0, 10).join(', ')}`);
         
+        // If no pairs found, log diagnostic info about the RSS feed format
+        if (allPairs.length === 0) {
+          logger.warn(`No valueTimeSplit pairs found in RSS feed for ${feedConfig.name}. Checking feed format...`);
+          // Check if feed has any podcast:valueTimeSplit tags
+          const hasValueTimeSplit = rssXml && rssXml.includes('<podcast:valueTimeSplit');
+          // Check if feed has any podcast:remoteItem tags
+          const hasRemoteItem = rssXml && rssXml.includes('<podcast:remoteItem');
+          // Check if feed has podcast:value tags
+          const hasValue = rssXml && rssXml.includes('<podcast:value');
+          // Check if feed has any items
+          const hasItems = feed.items && feed.items.length > 0;
+          
+          logger.warn(`RSS feed diagnostic for ${feedConfig.name}:`);
+          logger.warn(`  - Has podcast:valueTimeSplit tags: ${hasValueTimeSplit}`);
+          logger.warn(`  - Has podcast:remoteItem tags: ${hasRemoteItem}`);
+          logger.warn(`  - Has podcast:value tags: ${hasValue}`);
+          logger.warn(`  - Has feed items: ${hasItems} (${feed.items?.length || 0} items)`);
+          
+          // Log a sample of the RSS feed structure (first 500 chars containing podcast: tags)
+          if (rssXml) {
+            const valueTagMatch = rssXml.match(/<podcast:value[^>]*>[\s\S]{0,500}/i);
+            if (valueTagMatch) {
+              logger.debug(`Sample podcast:value structure from ${feedConfig.name}: ${valueTagMatch[0].substring(0, 300)}...`);
+            }
+          }
+        }
+        
         // Log first 13 pairs with their episode info for debugging
         if (allPairs.length >= 13) {
           const first13 = allPairs.slice(0, 13);
