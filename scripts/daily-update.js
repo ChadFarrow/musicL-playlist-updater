@@ -229,10 +229,26 @@ async function updateAllFeeds() {
         }
         
       } catch (error) {
-        logger.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
-        logger.error(`Error stack:`, error.stack);
-        console.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
-        errorCount++;
+        // Check if error is a 403/404 (access denied/not found) - these are not fatal
+        const isAccessError = error.message && (
+          error.message.includes('Status code 403') ||
+          error.message.includes('Status code 404') ||
+          error.message.includes('403') ||
+          error.message.includes('404') ||
+          error.message.includes('Forbidden') ||
+          error.message.includes('Not Found')
+        );
+        
+        if (isAccessError) {
+          logger.warn(`Access denied or feed not found for ${feedConfig.name || feedConfig.playlistId}: ${error.message}`);
+          logger.warn(`Skipping this feed (non-fatal error)`);
+          // Don't increment error count for access issues
+        } else {
+          logger.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
+          logger.error(`Error stack:`, error.stack);
+          console.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
+          errorCount++;
+        }
       }
     }
     
@@ -269,12 +285,16 @@ async function updateAllFeeds() {
     
     logger.info(`Daily update complete: ${updatedCount} playlist(s) updated, ${errorCount} error(s)`);
     
-    // If we updated at least one playlist, consider it a partial success
-    // Only fail completely if all feeds failed AND we had errors
-    const hasPartialSuccess = updatedCount > 0 || (errorCount === 0 && feedsToUpdate.length === 0);
+    // If we updated at least one playlist, or if we tried to update but found no new episodes, consider it success
+    // Only fail if we had actual errors (not access denied/not found)
+    const hasPartialSuccess = updatedCount > 0;
+    const allSkipped = feedsToUpdate.length > 0 && updatedCount === 0 && errorCount === 0; // All feeds had no updates
+    
+    // Success if we updated something, or if we had no actual errors
+    const success = hasPartialSuccess || errorCount === 0;
     
     return {
-      success: hasPartialSuccess || errorCount === 0,
+      success: success,
       updated: updatedCount,
       errors: errorCount
     };
