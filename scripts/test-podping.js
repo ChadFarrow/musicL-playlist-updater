@@ -2,6 +2,9 @@ import { readFileSync } from 'fs';
 import { PodPing } from '../src/services/PodPing.js';
 import { logger } from '../src/utils/logger.js';
 
+// Enable debug logging for more detailed output
+logger.level = 'debug';
+
 // Load configuration (optional)
 let config = {};
 try {

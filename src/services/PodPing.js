@@ -51,6 +51,9 @@ export class PodPing {
           postingKey: this.hivePostingKey
         };
         
+        logger.info(`PodPing: Trying POST request to ${url}`);
+        logger.debug(`PodPing POST body: ${JSON.stringify({ url: feedUrl, username: this.hiveUsername, postingKey: '***' })}`);
+        
         try {
           const response = await axios.post(url, body, {
             headers: headers,
@@ -58,12 +61,14 @@ export class PodPing {
             validateStatus: (status) => status < 500
           });
           
+          logger.info(`PodPing POST returned status ${response.status}`);
+          
           if (response.status >= 200 && response.status < 300) {
             logger.info(`PodPing notification sent successfully for ${feedUrl}`);
             return { success: true, message: 'Notification sent' };
           } else if (response.status === 401 || response.status === 404) {
             // If POST fails with 401 or 404, try GET with query parameters
-            logger.debug(`PodPing POST returned ${response.status}, trying GET with query params`);
+            logger.info(`PodPing POST returned ${response.status}, trying GET with query params`);
             return await this.tryGetRequest(feedUrl);
           } else {
             logger.warn(`PodPing notification returned status ${response.status} for ${feedUrl}`);
@@ -71,8 +76,10 @@ export class PodPing {
           }
         } catch (postError) {
           // If POST fails with network error, 401, or 404, try GET
-          if (postError.response?.status === 401 || postError.response?.status === 404 || !postError.response) {
-            logger.debug(`PodPing POST failed: ${postError.message}, trying GET with query params`);
+          const errorStatus = postError.response?.status;
+          logger.info(`PodPing POST failed: ${postError.message}${errorStatus ? ` (status ${errorStatus})` : ''}`);
+          if (errorStatus === 401 || errorStatus === 404 || !postError.response) {
+            logger.info(`PodPing: Falling back to GET request`);
             return await this.tryGetRequest(feedUrl);
           }
           throw postError;
@@ -139,9 +146,9 @@ export class PodPing {
         if (response.status >= 200 && response.status < 300) {
           logger.info(`PodPing notification sent successfully for ${feedUrl} via ${baseUrl}`);
           return { success: true, message: 'Notification sent' };
-        } else if (response.status === 404 && path !== endpointPaths[endpointPaths.length - 1]) {
-          // Try next endpoint path if 404
-          logger.debug(`PodPing GET returned 404 for ${baseUrl}, trying next path...`);
+        } else if ((response.status === 404 || response.status === 401) && path !== endpointPaths[endpointPaths.length - 1]) {
+          // Try next endpoint path if 404 or 401 (might be wrong endpoint)
+          logger.info(`PodPing GET returned ${response.status} for ${baseUrl}, trying next path...`);
           continue;
         } else {
           logger.warn(`PodPing notification returned status ${response.status} for ${feedUrl} via ${baseUrl}`);
@@ -150,6 +157,7 @@ export class PodPing {
           if (response.status === 401) {
             logger.warn('PodPing: Authentication failed. Please verify your Hive Posting Key and Username are correct.');
             logger.warn('PodPing: Ensure your Hive account is authorized to send PodPing notifications.');
+            logger.warn('PodPing: This might also indicate the endpoint path is incorrect.');
           } else if (response.status === 404) {
             logger.warn('PodPing: Endpoint not found. The podping.cloud API format may require a different endpoint path.');
             logger.warn('PodPing: Please check PodPing documentation for the correct API endpoint format.');
@@ -158,12 +166,13 @@ export class PodPing {
           return { success: false, message: `Status ${response.status}` };
         }
       } catch (error) {
-        // If not the last path, try the next one
-        if (path !== endpointPaths[endpointPaths.length - 1] && error.response?.status === 404) {
-          logger.debug(`PodPing GET failed for ${baseUrl}: ${error.message}, trying next path...`);
+        // If not the last path, try the next one (for both 404 and 401)
+        const errorStatus = error.response?.status;
+        if (path !== endpointPaths[endpointPaths.length - 1] && (errorStatus === 404 || errorStatus === 401)) {
+          logger.info(`PodPing GET failed for ${baseUrl}: ${error.message}${errorStatus ? ` (status ${errorStatus})` : ''}, trying next path...`);
           continue;
         }
-        // On last path or non-404 error, log and return
+        // On last path or non-404/401 error, log and return
         if (path === endpointPaths[endpointPaths.length - 1]) {
           logger.warn(`PodPing GET request failed for all endpoints: ${error.message}`);
           return { success: false, message: error.message };
