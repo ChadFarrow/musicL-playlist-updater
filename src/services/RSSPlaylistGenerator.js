@@ -216,8 +216,9 @@ export class RSSPlaylistGenerator {
         // Log first 13 pairs with their episode info for debugging
         if (allPairs.length >= 13) {
           const first13 = allPairs.slice(0, 13);
-          logger.debug(`First 13 pairs - Episode indices: ${first13.map(p => p.episodeIndex).join(', ')}`);
-          logger.debug(`First 13 pairs - Start times: ${first13.map(p => p.startTime).join(', ')}`);
+          logger.info(`First 13 pairs from RSS - Episode indices: ${first13.map(p => p.episodeIndex).join(', ')}`);
+          logger.info(`First 13 pairs from RSS - Start times: ${first13.map(p => p.startTime).join(', ')}`);
+          logger.info(`First 13 pairs from RSS - itemGuids: ${first13.map(p => p.itemGuid).join(', ')}`);
         }
         
         // Process pairs in sorted order
@@ -243,6 +244,16 @@ export class RSSPlaylistGenerator {
               newEpisodes.push(pair.itemGuid);
             }
           }
+        }
+        
+        // Log first 13 itemGuids that will be in the final playlist
+        if (allRemoteItems.length >= 13) {
+          const first13Final = allRemoteItems.slice(0, 13);
+          const first13ItemGuids = first13Final.map(xml => {
+            const match = xml.match(/itemGuid=["']([^"']+)["']/);
+            return match ? match[1] : 'unknown';
+          });
+          logger.info(`First 13 itemGuids in final playlist: ${first13ItemGuids.join(', ')}`);
         }
         
         logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (ordered by episode index and startTime)`);
