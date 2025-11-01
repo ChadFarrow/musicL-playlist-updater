@@ -210,8 +210,15 @@ async function updateAllFeeds() {
         // Check for updates
         const checkResult = await rssPlaylistGenerator.checkFeedForUpdates(feedConfig);
         
-        if (checkResult.hasUpdates) {
-          logger.info(`New episodes found in ${feedConfig.name || feedConfig.playlistId}, generating playlist`);
+        // Force update if lastEpisodeGuid is null (first time) or if explicitly requested
+        const forceUpdate = !feedConfig.lastEpisodeGuid || process.env.FORCE_UPDATE === 'true';
+        
+        if (checkResult.hasUpdates || forceUpdate) {
+          if (forceUpdate && !checkResult.hasUpdates) {
+            logger.info(`Forcing update for ${feedConfig.name || feedConfig.playlistId} (first time or forced)`);
+          } else {
+            logger.info(`New episodes found in ${feedConfig.name || feedConfig.playlistId}, generating playlist`);
+          }
           
           // Generate playlist from RSS feed
           const playlistResult = await rssPlaylistGenerator.generatePlaylistFromRSS(feedConfig);
