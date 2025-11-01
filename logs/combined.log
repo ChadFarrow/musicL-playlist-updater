@@ -52,3 +52,12 @@
 {"level":"info","message":"Generating playlist from RSS feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.483Z"}
 {"level":"info","message":"Generated playlist locally: playlists/ITDV-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:17.969Z"}
 {"level":"info","message":"Successfully updated docs/ITDV-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:32:19.316Z"}
+{"level":"info","message":"Starting daily RSS feed update","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.094Z"}
+{"level":"info","message":"Checking 2 enabled RSS feed(s)","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.097Z"}
+{"level":"info","message":"Checking feed: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.097Z"}
+{"level":"info","message":"Checking RSS feed for updates: Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.098Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.360Z"}
+{"level":"info","message":"No new episodes in Homegrown Hits Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.361Z"}
+{"level":"info","message":"Checking feed: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.361Z"}
+{"level":"info","message":"Checking RSS feed for updates: Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.361Z"}
+{"level":"info","message":"No new episodes in Into The Doerfel-Verse Podcast","service":"musicl-playlist-updater","timestamp":"2025-11-01T15:41:03.566Z"}
