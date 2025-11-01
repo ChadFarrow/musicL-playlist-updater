@@ -19,7 +19,7 @@
     "level": "debug"
   },
   "podping": {
-    "enabled": false,
+    "enabled": true,
     "endpoint": "https://podping.cloud",
     "timeout": 5000
   },
