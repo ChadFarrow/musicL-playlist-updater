@@ -120,13 +120,19 @@ export class RSSPlaylistGenerator {
       if (rssXml) {
         // Extract all valueTimeSplit pairs from entire RSS feed in document order
         const allPairs = [];
-        const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*startTime=["']([^"']+)["'][^>]*>[\s\S]*?<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
+        // Updated regex to handle feedGuid/itemGuid in any order (some feeds have itemGuid before feedGuid)
+        // Match valueTimeSplit tag, then capture the remoteItem tag (handles both self-closing and closing tags)
+        const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*startTime=["']([^"']+)["'][^>]*>[\s\S]*?<podcast:remoteItem[\s\S]*?(?:\/>|<\/podcast:remoteItem>)/gi;
         let match;
         while ((match = valueTimeSplitRegex.exec(rssXml)) !== null) {
           try {
             const startTime = parseFloat(match[1]) || 0;
-            const pairFeedGuid = match[2];
-            const pairItemGuid = match[3];
+            // Extract feedGuid and itemGuid from the remoteItem tag (in any order, may span multiple lines)
+            const remoteItemTag = match[0].match(/<podcast:remoteItem[\s\S]*?(?:\/>|<\/podcast:remoteItem>)/i)?.[0] || '';
+            const feedGuidMatch = remoteItemTag.match(/feedGuid=["']([^"']+)["']/i);
+            const itemGuidMatch = remoteItemTag.match(/itemGuid=["']([^"']+)["']/i);
+            const pairFeedGuid = feedGuidMatch ? feedGuidMatch[1] : null;
+            const pairItemGuid = itemGuidMatch ? itemGuidMatch[1] : null;
             
             if (pairFeedGuid && pairItemGuid) {
               // Determine which episode this belongs to by finding the nearest <item> tag
