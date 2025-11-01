@@ -155,9 +155,21 @@ export class RSSPlaylistGenerator {
           }
         }
         
-        // Preserve document order - RSS feed already has pairs in the correct order
-        // Sort by matchIndex to maintain the exact order they appear in the RSS feed document
+        // Sort by episode index (newest first), then by startTime within each episode
+        // RSS feed has episodes newest first, tracks ordered by startTime within episode
         allPairs.sort((a, b) => {
+          // First sort by episode index (lower index = newer episode, feed.items[0] is newest)
+          if (a.episodeIndex >= 0 && b.episodeIndex >= 0) {
+            if (a.episodeIndex !== b.episodeIndex) {
+              return a.episodeIndex - b.episodeIndex;
+            }
+            // Same episode - sort by startTime
+            return a.startTime - b.startTime;
+          }
+          // If one has episode index and other doesn't, prioritize the one with index
+          if (a.episodeIndex >= 0 && b.episodeIndex < 0) return -1;
+          if (b.episodeIndex >= 0 && a.episodeIndex < 0) return 1;
+          // If neither has episode index, preserve document order
           return a.matchIndex - b.matchIndex;
         });
         
