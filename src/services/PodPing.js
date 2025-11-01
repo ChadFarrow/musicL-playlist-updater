@@ -61,8 +61,8 @@ export class PodPing {
           if (response.status >= 200 && response.status < 300) {
             logger.info(`PodPing notification sent successfully for ${feedUrl}`);
             return { success: true, message: 'Notification sent' };
-          } else if (response.status === 401) {
-            // If POST with JSON body fails, try GET with query parameters
+          } else if (response.status === 401 || response.status === 404) {
+            // If POST fails with 401 or 404, try GET with query parameters
             logger.debug(`PodPing POST returned ${response.status}, trying GET with query params`);
             return await this.tryGetRequest(feedUrl);
           } else {
@@ -70,8 +70,8 @@ export class PodPing {
             return { success: false, message: `Status ${response.status}` };
           }
         } catch (postError) {
-          // If POST fails with network error or 401, try GET
-          if (postError.response?.status === 401 || !postError.response) {
+          // If POST fails with network error, 401, or 404, try GET
+          if (postError.response?.status === 401 || postError.response?.status === 404 || !postError.response) {
             logger.debug(`PodPing POST failed: ${postError.message}, trying GET with query params`);
             return await this.tryGetRequest(feedUrl);
           }
@@ -99,52 +99,81 @@ export class PodPing {
    * @private
    */
   async tryGetRequest(feedUrl) {
-    const url = `${this.endpoint}?url=${encodeURIComponent(feedUrl)}`;
+    // Try different endpoint paths
+    const endpointPaths = [
+      '', // Root endpoint
+      '/ping',
+      '/api/podping',
+      '/api/v1/podping',
+      '/podping'
+    ];
     
-    const headers = {};
-    if (this.hivePostingKey && this.hiveUsername) {
-      // Try different header formats
-      headers['X-Hive-Username'] = this.hiveUsername;
-      headers['X-Hive-Posting-Key'] = this.hivePostingKey;
-      // Also try alternative header names
-      headers['Hive-Username'] = this.hiveUsername;
-      headers['Hive-Posting-Key'] = this.hivePostingKey;
-      // Try with Authorization header
-      headers['Authorization'] = `Hive ${this.hiveUsername}:${this.hivePostingKey}`;
-    }
-    
-    // Also try with query parameters
-    let urlWithAuth = url;
-    if (this.hivePostingKey && this.hiveUsername) {
-      urlWithAuth = `${this.endpoint}?url=${encodeURIComponent(feedUrl)}&username=${encodeURIComponent(this.hiveUsername)}&postingKey=${encodeURIComponent(this.hivePostingKey)}`;
-    }
-    
-    try {
-      const response = await axios.get(urlWithAuth, {
-        headers: headers,
-        timeout: this.timeout,
-        validateStatus: (status) => status < 500
-      });
+    // Try with query parameters in URL
+    for (const path of endpointPaths) {
+      const baseUrl = `${this.endpoint}${path}`;
+      let url = `${baseUrl}?url=${encodeURIComponent(feedUrl)}`;
       
-      if (response.status >= 200 && response.status < 300) {
-        logger.info(`PodPing notification sent successfully for ${feedUrl}`);
-        return { success: true, message: 'Notification sent' };
-      } else {
-        logger.warn(`PodPing notification returned status ${response.status} for ${feedUrl}`);
+      const headers = {};
+      if (this.hivePostingKey && this.hiveUsername) {
+        // Try different header formats
+        headers['X-Hive-Username'] = this.hiveUsername;
+        headers['X-Hive-Posting-Key'] = this.hivePostingKey;
+        // Also try alternative header names
+        headers['Hive-Username'] = this.hiveUsername;
+        headers['Hive-Posting-Key'] = this.hivePostingKey;
+        // Try with Authorization header
+        headers['Authorization'] = `Hive ${this.hiveUsername}:${this.hivePostingKey}`;
         
-        // Provide helpful error message for 401
-        if (response.status === 401) {
-          logger.warn('PodPing: Authentication failed. Please verify your Hive Posting Key and Username are correct.');
-          logger.warn('PodPing: Ensure your Hive account is authorized to send PodPing notifications.');
-          logger.warn('PodPing: The podping.cloud API format may require different authentication. Please check PodPing documentation.');
-        }
-        
-        return { success: false, message: `Status ${response.status}` };
+        // Also try with query parameters
+        url = `${baseUrl}?url=${encodeURIComponent(feedUrl)}&username=${encodeURIComponent(this.hiveUsername)}&postingKey=${encodeURIComponent(this.hivePostingKey)}`;
       }
-    } catch (error) {
-      logger.warn(`PodPing GET request failed: ${error.message}`);
-      return { success: false, message: error.message };
+      
+      try {
+        logger.debug(`PodPing: Trying GET request to ${baseUrl}`);
+        const response = await axios.get(url, {
+          headers: headers,
+          timeout: this.timeout,
+          validateStatus: (status) => status < 500
+        });
+        
+        if (response.status >= 200 && response.status < 300) {
+          logger.info(`PodPing notification sent successfully for ${feedUrl} via ${baseUrl}`);
+          return { success: true, message: 'Notification sent' };
+        } else if (response.status === 404 && path !== endpointPaths[endpointPaths.length - 1]) {
+          // Try next endpoint path if 404
+          logger.debug(`PodPing GET returned 404 for ${baseUrl}, trying next path...`);
+          continue;
+        } else {
+          logger.warn(`PodPing notification returned status ${response.status} for ${feedUrl} via ${baseUrl}`);
+          
+          // Provide helpful error message for 401
+          if (response.status === 401) {
+            logger.warn('PodPing: Authentication failed. Please verify your Hive Posting Key and Username are correct.');
+            logger.warn('PodPing: Ensure your Hive account is authorized to send PodPing notifications.');
+          } else if (response.status === 404) {
+            logger.warn('PodPing: Endpoint not found. The podping.cloud API format may require a different endpoint path.');
+            logger.warn('PodPing: Please check PodPing documentation for the correct API endpoint format.');
+          }
+          
+          return { success: false, message: `Status ${response.status}` };
+        }
+      } catch (error) {
+        // If not the last path, try the next one
+        if (path !== endpointPaths[endpointPaths.length - 1] && error.response?.status === 404) {
+          logger.debug(`PodPing GET failed for ${baseUrl}: ${error.message}, trying next path...`);
+          continue;
+        }
+        // On last path or non-404 error, log and return
+        if (path === endpointPaths[endpointPaths.length - 1]) {
+          logger.warn(`PodPing GET request failed for all endpoints: ${error.message}`);
+          return { success: false, message: error.message };
+        }
+      }
     }
+    
+    // If we get here, all endpoint paths failed
+    logger.warn('PodPing: All endpoint paths failed. Please check PodPing documentation for the correct API format.');
+    return { success: false, message: 'All endpoint paths failed' };
   }
 }
 
