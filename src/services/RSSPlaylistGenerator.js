@@ -392,13 +392,17 @@ export class RSSPlaylistGenerator {
             logger.info(`Synced playlist to GitHub: ${githubPath}`);
             
             // Send PodPing notification after successful GitHub sync
-            if (this.config.podping?.enabled && feedConfig.rssUrl) {
+            // PodPing should notify for the playlist feed URL (not the source RSS feed)
+            if (this.config.podping?.enabled && this.config.githubRepoOwner && this.config.githubRepoName) {
               try {
                 await this.initializePodPing();
                 if (this.podping) {
-                  const podpingResult = await this.podping.sendNotification(feedConfig.rssUrl);
+                  // Construct playlist feed URL: https://raw.githubusercontent.com/{owner}/{repo}/{branch}/docs/{playlistId}.xml
+                  const playlistFeedUrl = `https://raw.githubusercontent.com/${this.config.githubRepoOwner}/${this.config.githubRepoName}/${this.config.githubRepoBranch || 'main'}/docs/${feedConfig.playlistId}.xml`;
+                  logger.info(`Sending PodPing notification for playlist feed: ${playlistFeedUrl}`);
+                  const podpingResult = await this.podping.sendNotification(playlistFeedUrl);
                   if (podpingResult.success) {
-                    logger.info(`PodPing notification sent for ${feedConfig.name}`);
+                    logger.info(`PodPing notification sent for ${feedConfig.name} playlist`);
                   } else {
                     logger.warn(`PodPing notification failed for ${feedConfig.name}: ${podpingResult.message}`);
                   }
