@@ -107,10 +107,10 @@ export class RSSPlaylistGenerator {
       const newEpisodes = [];
       const existingEpisodes = [];
       
-      // Extract ALL feedGuid/itemGuid pairs from RSS feed in exact order (newest episode first, then by startTime)
-      // This ensures the playlist matches the exact order they appear in the RSS feed
+      // Extract ALL feedGuid/itemGuid pairs from RSS feed in EXACT order as they appear
+      // This ensures the playlist matches the exact order in the RSS feed (newest episode first, then by startTime)
       if (rssXml) {
-        // Extract all valueTimeSplit pairs from entire RSS feed, preserving order
+        // Extract all valueTimeSplit pairs from entire RSS feed in document order
         const allPairs = [];
         const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*startTime=["']([^"']+)["'][^>]*>[\s\S]*?<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
         let match;
@@ -146,7 +146,7 @@ export class RSSPlaylistGenerator {
                 startTime: startTime,
                 episodeIndex: episodeIndex,
                 episodeGuid: episodeGuid,
-                matchIndex: matchIndex
+                matchIndex: matchIndex // Preserve original position in RSS feed
               });
             }
           } catch (pairError) {
@@ -156,11 +156,21 @@ export class RSSPlaylistGenerator {
         }
         
         // Sort pairs: by episode index (newest first), then by startTime within each episode
+        // This matches the RSS feed order (episodes newest first, tracks by startTime within episode)
+        // But only if we can determine episode index - otherwise preserve document order
         allPairs.sort((a, b) => {
-          if (a.episodeIndex !== b.episodeIndex) {
-            return a.episodeIndex - b.episodeIndex; // Lower index = newer episode
+          // If both have valid episode indices, sort by episode then startTime
+          if (a.episodeIndex >= 0 && b.episodeIndex >= 0) {
+            if (a.episodeIndex !== b.episodeIndex) {
+              return a.episodeIndex - b.episodeIndex; // Lower index = newer episode (feed.items[0] is newest)
+            }
+            return a.startTime - b.startTime; // Within same episode, sort by startTime
           }
-          return a.startTime - b.startTime; // Within same episode, sort by startTime
+          // If one has valid episode index and other doesn't, prioritize the one with index
+          if (a.episodeIndex >= 0 && b.episodeIndex < 0) return -1;
+          if (b.episodeIndex >= 0 && a.episodeIndex < 0) return 1;
+          // If neither has episode index, preserve document order (by matchIndex)
+          return a.matchIndex - b.matchIndex;
         });
         
         // Process pairs in sorted order
@@ -188,7 +198,7 @@ export class RSSPlaylistGenerator {
           }
         }
         
-        logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (ordered by episode and startTime)`);
+        logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (ordered by episode index and startTime)`);
       }
       
       // Also extract standalone remoteItem tags from RSS feed (if any)
