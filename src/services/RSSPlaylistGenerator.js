@@ -45,10 +45,21 @@ export class RSSPlaylistGenerator {
         return { success: false, error: 'No items found in feed' };
       }
 
+      // Fetch raw RSS XML to extract feedGuid/itemGuid pairs from valueTimeSplit tags
+      let rssXml = null;
+      try {
+        const axios = (await import('axios')).default;
+        const response = await axios.get(feedConfig.rssUrl);
+        rssXml = response.data;
+      } catch (error) {
+        logger.warn(`Could not fetch raw RSS XML: ${error.message}`);
+      }
+
       // Get existing playlist and merge with new episodes
       let existingContent = null;
       let existingPlaylistFormat = null;
       let existingRemoteItems = [];
+      const existingItemsMap = new Map(); // itemGuid -> existing remoteItem
       
       if (this.config.enableGitHubSync) {
         try {
@@ -71,11 +82,13 @@ export class RSSPlaylistGenerator {
                   const itemGuidMatch = xml.match(/itemGuid=["']([^"']+)["']/);
                   const feedGuidMatch = xml.match(/feedGuid=["']([^"']+)["']/);
                   if (itemGuidMatch && feedGuidMatch) {
-                    existingRemoteItems.push({
+                    const remoteItem = {
                       itemGuid: itemGuidMatch[1],
                       feedGuid: feedGuidMatch[1],
                       xml: xml.trim()
-                    });
+                    };
+                    existingRemoteItems.push(remoteItem);
+                    existingItemsMap.set(remoteItem.itemGuid, remoteItem);
                   }
                 }
                 logger.info(`Found ${existingRemoteItems.length} existing remoteItems in playlist`);
@@ -87,54 +100,103 @@ export class RSSPlaylistGenerator {
         }
       }
 
-      // Identify new episodes from RSS feed that aren't already in playlist
-      // IMPORTANT: .filter() preserves the original RSS feed order - this ensures
-      // tracks are added to the playlist in the same order they appear in the main RSS feed
+      // Extract feedGuid/itemGuid pairs from RSS feed (like Auto-musicL-Maker does)
+      // Auto-musicL-Maker extracts all pairs from valueTimeSplit tags in RSS feed order
       const feedGuid = feed.guid || feedConfig.feedGuid || this.generateGUID();
-      const existingItemGuids = new Set(existingRemoteItems.map(item => item.itemGuid));
-      
-      const newEpisodes = feed.items.filter(episode => {
-        const itemGuid = episode.guid || episode.link;
-        return !existingItemGuids.has(itemGuid);
-      });
-      
-      logger.info(`Found ${newEpisodes.length} new episodes out of ${feed.items.length} total in RSS feed`);
-
-      // Merge existing tracks with new episodes
       const allRemoteItems = [];
+      const addedItemGuids = new Set();
+      const newEpisodes = [];
+      const existingEpisodes = [];
       
-      // Add new episodes in the exact same order they appear in the main RSS feed
-      // This preserves the original feed order - tracks will play in the same sequence
-      // as they appear in the source RSS feed (no sorting or reordering)
-      for (const episode of newEpisodes) {
-        const itemGuid = episode.guid || episode.link;
-        if (episode.remoteItem) {
-          const feedURL = episode.remoteItem.feedURL || feedConfig.rssUrl;
-          allRemoteItems.push(`      <podcast:remoteItem feedGuid="${episode.remoteItem.feedGuid}"${feedURL ? ` feedURL="${feedURL}"` : ''} itemGuid="${episode.remoteItem.itemGuid}"/>`);
-        } else {
-          allRemoteItems.push(`      <podcast:remoteItem feedGuid="${feedGuid}" itemGuid="${itemGuid}"/>`);
+      // Process RSS feed episodes in order (newest first) - matching Auto-musicL-Maker
+      for (const episode of feed.items) {
+        const episodeGuid = episode.guid || episode.link;
+        
+        // Extract feedGuid/itemGuid pairs from this episode's RSS XML content
+        if (rssXml) {
+          // Find this episode's item section in the RSS XML
+          const episodeGuidPattern = episodeGuid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const episodeItemRegex = new RegExp(`<item[^>]*>[\\s\\S]*?<guid[^>]*>${episodeGuidPattern}[\\s\\S]*?</item>`, 'i');
+          const episodeMatch = rssXml.match(episodeItemRegex);
+          
+          if (episodeMatch) {
+            const episodeContent = episodeMatch[0];
+            
+            // Extract feedGuid/itemGuid pairs from valueTimeSplit tags in this episode (in order)
+            const valueTimeSplitRegex = /<podcast:valueTimeSplit[^>]*>[\s\S]*?<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
+            let match;
+            while ((match = valueTimeSplitRegex.exec(episodeContent)) !== null) {
+              const pairFeedGuid = match[1];
+              const pairItemGuid = match[2];
+              
+              if (!addedItemGuids.has(pairItemGuid)) {
+                // Check if this item exists in playlist
+                const existingItem = existingItemsMap.get(pairItemGuid);
+                if (existingItem) {
+                  // Use existing XML to preserve formatting
+                  let normalizedXml = existingItem.xml.trim();
+                  if (!normalizedXml.includes('feedGuid')) {
+                    normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
+                  } else {
+                    normalizedXml = `      ${normalizedXml}`;
+                  }
+                  allRemoteItems.push(normalizedXml);
+                  addedItemGuids.add(pairItemGuid);
+                  existingEpisodes.push(pairItemGuid);
+                } else {
+                  // New track from RSS feed
+                  allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
+                  addedItemGuids.add(pairItemGuid);
+                  newEpisodes.push(pairItemGuid);
+                }
+              }
+            }
+            
+            // Also extract standalone remoteItem tags from this episode
+            const remoteItemRegex = /<podcast:remoteItem[^>]*feedGuid=["']([^"']+)["'][^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi;
+            while ((match = remoteItemRegex.exec(episodeContent)) !== null) {
+              const pairFeedGuid = match[1];
+              const pairItemGuid = match[2];
+              
+              // Skip if already added from valueTimeSplit
+              if (!addedItemGuids.has(pairItemGuid)) {
+                const existingItem = existingItemsMap.get(pairItemGuid);
+                if (existingItem) {
+                  let normalizedXml = existingItem.xml.trim();
+                  if (!normalizedXml.includes('feedGuid')) {
+                    normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
+                  } else {
+                    normalizedXml = `      ${normalizedXml}`;
+                  }
+                  allRemoteItems.push(normalizedXml);
+                  addedItemGuids.add(pairItemGuid);
+                  existingEpisodes.push(pairItemGuid);
+                } else {
+                  allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
+                  addedItemGuids.add(pairItemGuid);
+                  newEpisodes.push(pairItemGuid);
+                }
+              }
+            }
+          }
         }
       }
       
-      // Add existing tracks after new ones (preserve original formatting but normalize indentation)
+      // Add any remaining existing tracks not found in RSS feed (at the end)
       for (const existingItem of existingRemoteItems) {
-        // Normalize to standard format with consistent indentation
-        let normalizedXml = existingItem.xml;
-        // Remove existing indentation/spaces, then add our standard indentation
-        normalizedXml = normalizedXml.trim();
-        // Ensure it matches our format (if it has extra attributes, preserve them)
-        if (!normalizedXml.includes('feedGuid')) {
-          // Rebuild if needed
-          normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
-        } else {
-          // Just normalize indentation
-          normalizedXml = `      ${normalizedXml}`;
+        if (!addedItemGuids.has(existingItem.itemGuid)) {
+          let normalizedXml = existingItem.xml.trim();
+          if (!normalizedXml.includes('feedGuid')) {
+            normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
+          } else {
+            normalizedXml = `      ${normalizedXml}`;
+          }
+          allRemoteItems.push(normalizedXml);
         }
-        allRemoteItems.push(normalizedXml);
       }
       
       const totalEpisodeCount = allRemoteItems.length;
-      logger.info(`Merged playlist: ${newEpisodes.length} new + ${existingRemoteItems.length} existing = ${totalEpisodeCount} total tracks`);
+      logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing = ${totalEpisodeCount} total tracks`);
 
       // Generate musicL playlist XML (preserving existing format)
       const playlistXML = this.generateMusicLXML(feed, feedConfig, existingPlaylistFormat, allRemoteItems);
