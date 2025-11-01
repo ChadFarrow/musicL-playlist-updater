@@ -4,14 +4,21 @@ import { RSSPlaylistGenerator } from '../src/services/RSSPlaylistGenerator.js';
 import { GitHubSync } from '../src/services/GitHubSync.js';
 import { logger } from '../src/utils/logger.js';
 
-// Load configuration
+// Load configuration (optional - use environment variables if config.json doesn't exist)
 let config = {};
 try {
   const configData = readFileSync('./config.json', 'utf8');
   config = JSON.parse(configData);
+  logger.info('Loaded config.json');
 } catch (error) {
-  logger.error('Failed to load config.json:', error);
-  process.exit(1);
+  if (error.code === 'ENOENT') {
+    // config.json doesn't exist - that's okay, we'll use environment variables and defaults
+    logger.info('config.json not found, using environment variables and defaults');
+    config = {};
+  } else {
+    logger.error('Failed to load config.json:', error);
+    process.exit(1);
+  }
 }
 
 // Load feeds configuration
