@@ -247,6 +247,12 @@ export class RSSPlaylistGenerator {
       const totalEpisodeCount = allRemoteItems.length;
       logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing from RSS feed + ${preservedFromMissingEpisodes.length} preserved from missing episodes = ${totalEpisodeCount} total tracks`);
 
+      // If no tracks found, return error
+      if (totalEpisodeCount === 0) {
+        logger.warn(`No tracks found for playlist ${feedConfig.playlistId}`);
+        return { success: false, error: 'No tracks found in playlist or RSS feed' };
+      }
+
       // Generate musicL playlist XML (preserving existing format)
       const playlistXML = this.generateMusicLXML(feed, feedConfig, existingPlaylistFormat, allRemoteItems);
       

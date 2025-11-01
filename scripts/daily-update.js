@@ -230,6 +230,8 @@ async function updateAllFeeds() {
         
       } catch (error) {
         logger.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
+        logger.error(`Error stack:`, error.stack);
+        console.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
         errorCount++;
       }
     }
@@ -296,12 +298,14 @@ updateAllFeeds()
       logger.info('Daily update completed successfully');
       process.exit(0);
     } else {
-      logger.error('Daily update completed with errors');
+      logger.error(`Daily update completed with ${result.errors || 0} error(s)`);
       process.exit(1);
     }
   })
   .catch(error => {
     logger.error('Fatal error during daily update:', error);
+    logger.error('Error stack:', error.stack);
+    console.error('Fatal error:', error);
     process.exit(1);
   });
 
