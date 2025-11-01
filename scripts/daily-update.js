@@ -269,15 +269,28 @@ async function updateAllFeeds() {
     
     logger.info(`Daily update complete: ${updatedCount} playlist(s) updated, ${errorCount} error(s)`);
     
+    // If we updated at least one playlist, consider it a partial success
+    // Only fail completely if all feeds failed AND we had errors
+    const hasPartialSuccess = updatedCount > 0 || (errorCount === 0 && feedsToUpdate.length === 0);
+    
     return {
-      success: errorCount === 0,
+      success: hasPartialSuccess || errorCount === 0,
       updated: updatedCount,
       errors: errorCount
     };
     
   } catch (error) {
     logger.error('Error during daily feed update:', error);
-    throw error;
+    logger.error('Error stack:', error.stack);
+    console.error('Error during daily feed update:', error);
+    console.error('Error stack:', error.stack);
+    return {
+      success: false,
+      updated: 0,
+      errors: 1,
+      error: error.message || 'Unknown error',
+      errorStack: error.stack
+    };
   }
 }
 

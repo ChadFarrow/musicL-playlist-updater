@@ -290,7 +290,14 @@ export class RSSPlaylistGenerator {
 
     } catch (error) {
       logger.error(`Error generating playlist from RSS feed ${feedConfig.name}:`, error);
-      throw error;
+      logger.error(`Error stack:`, error.stack);
+      console.error(`Error generating playlist from RSS feed ${feedConfig.name}:`, error);
+      console.error(`Error stack:`, error.stack);
+      return {
+        success: false,
+        error: error.message || 'Unknown error',
+        errorStack: error.stack
+      };
     }
   }
 
