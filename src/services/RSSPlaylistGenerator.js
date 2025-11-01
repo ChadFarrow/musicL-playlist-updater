@@ -48,7 +48,6 @@ export class RSSPlaylistGenerator {
       // Fetch raw RSS XML to extract feedGuid/itemGuid pairs from valueTimeSplit tags
       let rssXml = null;
       try {
-        const axios = (await import('axios')).default;
         const response = await axios.get(feedConfig.rssUrl);
         rssXml = response.data;
       } catch (error) {
@@ -183,6 +182,8 @@ export class RSSPlaylistGenerator {
       }
       
       // Add any remaining existing tracks not found in RSS feed (at the end)
+      // This preserves tracks from older episodes that may have been removed from the RSS feed
+      const preservedFromMissingEpisodes = [];
       for (const existingItem of existingRemoteItems) {
         if (!addedItemGuids.has(existingItem.itemGuid)) {
           let normalizedXml = existingItem.xml.trim();
@@ -192,11 +193,12 @@ export class RSSPlaylistGenerator {
             normalizedXml = `      ${normalizedXml}`;
           }
           allRemoteItems.push(normalizedXml);
+          preservedFromMissingEpisodes.push(existingItem.itemGuid);
         }
       }
       
       const totalEpisodeCount = allRemoteItems.length;
-      logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing = ${totalEpisodeCount} total tracks`);
+      logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing from RSS feed + ${preservedFromMissingEpisodes.length} preserved from missing episodes = ${totalEpisodeCount} total tracks`);
 
       // Generate musicL playlist XML (preserving existing format)
       const playlistXML = this.generateMusicLXML(feed, feedConfig, existingPlaylistFormat, allRemoteItems);
