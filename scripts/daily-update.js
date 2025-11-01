@@ -70,22 +70,25 @@ async function updateAllFeeds() {
         // Check for updates
         const checkResult = await rssPlaylistGenerator.checkFeedForUpdates(feedConfig);
         
-        if (checkResult.hasUpdates) {
-          logger.info(`New episodes found in ${feedConfig.name}, generating playlist`);
-          
-          // Generate playlist from RSS feed
-          const playlistResult = await rssPlaylistGenerator.generatePlaylistFromRSS(feedConfig);
-          
-          if (playlistResult.success) {
-            logger.info(`Successfully updated playlist: ${playlistResult.episodeCount} episodes`);
+        // Always regenerate playlist (ensures format updates are applied, even if no new episodes)
+        // This ensures playlists are always in the correct format
+        logger.info(`Regenerating playlist for ${feedConfig.name}`);
+        
+        // Generate playlist from RSS feed
+        const playlistResult = await rssPlaylistGenerator.generatePlaylistFromRSS(feedConfig);
+        
+        if (playlistResult.success) {
+          if (checkResult.hasUpdates) {
+            logger.info(`New episodes found in ${feedConfig.name}, playlist updated`);
             logger.info(`Latest episode: ${playlistResult.lastEpisode}`);
-            updatedCount++;
           } else {
-            logger.error(`Failed to generate playlist for ${feedConfig.name}`);
-            errorCount++;
+            logger.info(`No new episodes, but playlist regenerated to ensure correct format`);
           }
+          logger.info(`Playlist has ${playlistResult.episodeCount} episodes`);
+          updatedCount++;
         } else {
-          logger.info(`No new episodes in ${feedConfig.name}`);
+          logger.error(`Failed to generate playlist for ${feedConfig.name}`);
+          errorCount++;
         }
         
       } catch (error) {
