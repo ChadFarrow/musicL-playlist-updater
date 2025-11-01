@@ -156,10 +156,12 @@ export class RSSPlaylistGenerator {
         }
         
         // Preserve document order - RSS feed already has pairs in the correct order
-        // Just sort by matchIndex to maintain the order they appear in the RSS feed
+        // Sort by matchIndex to maintain the exact order they appear in the RSS feed document
         allPairs.sort((a, b) => {
           return a.matchIndex - b.matchIndex;
         });
+        
+        logger.info(`Extracted ${allPairs.length} pairs from RSS feed. First 5 itemGuids: ${allPairs.slice(0, 5).map(p => p.itemGuid).join(', ')}`);
         
         // Process pairs in sorted order
         for (const pair of allPairs) {
@@ -228,19 +230,33 @@ export class RSSPlaylistGenerator {
         }
       }
       
+      // Build a map of all pairs extracted from RSS feed (for validation)
+      const rssFeedPairs = new Set();
+      if (rssXml) {
+        const allRssPairs = rssXml.matchAll(/<podcast:valueTimeSplit[^>]*>[\s\S]*?<podcast:remoteItem[^>]*itemGuid=["']([^"']+)["'][^>]*\/?>/gi);
+        for (const match of allRssPairs) {
+          rssFeedPairs.add(match[1]);
+        }
+      }
+      
       // Add any remaining existing tracks not found in RSS feed (at the end)
-      // This preserves tracks from older episodes that may have been removed from the RSS feed
+      // BUT only if they're actually missing from RSS feed (not just from older episodes)
       const preservedFromMissingEpisodes = [];
       for (const existingItem of existingRemoteItems) {
         if (!addedItemGuids.has(existingItem.itemGuid)) {
-          let normalizedXml = existingItem.xml.trim();
-          if (!normalizedXml.includes('feedGuid')) {
-            normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
-          } else {
-            normalizedXml = `      ${normalizedXml}`;
+          // Only preserve if it's truly not in the RSS feed
+          // If it's in RSS feed but wasn't added, it means it's from an older episode and should be skipped
+          // The RSS feed order already includes all episodes, so we don't need to preserve "older" tracks
+          if (!rssFeedPairs.has(existingItem.itemGuid)) {
+            let normalizedXml = existingItem.xml.trim();
+            if (!normalizedXml.includes('feedGuid')) {
+              normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
+            } else {
+              normalizedXml = `      ${normalizedXml}`;
+            }
+            allRemoteItems.push(normalizedXml);
+            preservedFromMissingEpisodes.push(existingItem.itemGuid);
           }
-          allRemoteItems.push(normalizedXml);
-          preservedFromMissingEpisodes.push(existingItem.itemGuid);
         }
       }
       
