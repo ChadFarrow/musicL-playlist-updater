@@ -41,7 +41,9 @@ const fullConfig = {
   podping: config.podping || {
     enabled: false,
     endpoint: 'https://podping.cloud',
-    timeout: 5000
+    timeout: 5000,
+    hiveUsername: '',
+    hivePostingKey: ''
   },
   
   // Logging

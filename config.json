@@ -21,7 +21,9 @@
   "podping": {
     "enabled": true,
     "endpoint": "https://podping.cloud",
-    "timeout": 5000
+    "timeout": 5000,
+    "hiveUsername": "",
+    "hivePostingKey": ""
   },
   "productionMode": true
 }
