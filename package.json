@@ -18,7 +18,8 @@
     "update-all": "node music-playlist-updater.js update-all",
     "status": "node update-cli.js status",
     "build": "node build-music-playlist.js",
-    "rebuild": "node build-music-playlist.js rebuild"
+    "rebuild": "node build-music-playlist.js rebuild",
+    "test-podping": "node scripts/test-podping.js"
   },
   "keywords": ["rss", "podcast", "musicl", "playlist", "automation"],
   "author": "ChadFarrow",
