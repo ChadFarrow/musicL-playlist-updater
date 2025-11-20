@@ -288,12 +288,8 @@ async function updateAllFeeds() {
       feedsToUpdate.forEach(feed => {
         const existingIndex = updatedFeeds.findIndex(f => f.playlistId === feed.playlistId);
         if (existingIndex >= 0) {
-          // Update existing feed while preserving lastChecked and lastEpisodeGuid
-          updatedFeeds[existingIndex] = {
-            ...feed,
-            lastChecked: updatedFeeds[existingIndex].lastChecked,
-            lastEpisodeGuid: updatedFeeds[existingIndex].lastEpisodeGuid
-          };
+          // Update existing feed with new values including lastChecked and lastEpisodeGuid
+          updatedFeeds[existingIndex] = feed;
         } else {
           // Add new feed
           updatedFeeds.push(feed);
