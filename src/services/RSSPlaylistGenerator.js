@@ -206,23 +206,10 @@ export class RSSPlaylistGenerator {
           }
         }
         
-        // Sort by episode index (newest first), then by startTime within each episode
-        // RSS feed has episodes newest first, tracks ordered by startTime within episode
-        allPairs.sort((a, b) => {
-          // First sort by episode index (lower index = newer episode, feed.items[0] is newest)
-          if (a.episodeIndex >= 0 && b.episodeIndex >= 0) {
-            if (a.episodeIndex !== b.episodeIndex) {
-              return a.episodeIndex - b.episodeIndex;
-            }
-            // Same episode - sort by startTime
-            return a.startTime - b.startTime;
-          }
-          // If one has episode index and other doesn't, prioritize the one with index
-          if (a.episodeIndex >= 0 && b.episodeIndex < 0) return -1;
-          if (b.episodeIndex >= 0 && a.episodeIndex < 0) return 1;
-          // If neither has episode index, preserve document order
-          return a.matchIndex - b.matchIndex;
-        });
+        // Preserve document order - RSS feed already has items in correct chronological order
+        // The regex match processes the RSS feed top-to-bottom, so allPairs is already in the
+        // correct order (newest episode first, then by startTime within each episode).
+        // No sorting needed - process items in the order they appear in the feed.
         
         logger.info(`Extracted ${allPairs.length} pairs from RSS feed. First 5 itemGuids: ${allPairs.slice(0, 5).map(p => p.itemGuid).join(', ')}`);
         logger.info(`Episode index distribution: ${Array.from(new Set(allPairs.map(p => p.episodeIndex))).sort((a,b) => a-b).slice(0, 10).join(', ')}`);
@@ -297,7 +284,7 @@ export class RSSPlaylistGenerator {
           logger.info(`First 13 itemGuids in final playlist: ${first13ItemGuids.join(', ')}`);
         }
         
-        logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (ordered by episode index and startTime)`);
+        logger.info(`Extracted ${allPairs.length} feedGuid/itemGuid pairs from RSS feed (preserving document order)`);
       }
       
       // Also extract standalone remoteItem tags from RSS feed (if any)

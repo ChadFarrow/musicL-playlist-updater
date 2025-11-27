@@ -27,8 +27,8 @@ class PlaylistUpdater {
 
       const playlistContent = readFileSync(playlistPath, 'utf8');
       
-      // Extract RSS URL from podcast:txt tag
-      const rssMatch = playlistContent.match(/<podcast:txt purpose="source-rss">([^<]+)<\/podcast:txt>/);
+      // Extract RSS URL from podcast:txt tag (supports both "source-rss" and "source-feed")
+      const rssMatch = playlistContent.match(/<podcast:txt purpose="source-(?:rss|feed)">([^<]+)<\/podcast:txt>/);
       
       if (!rssMatch) {
         throw new Error(`No source RSS URL found in playlist: ${playlistId}`);
