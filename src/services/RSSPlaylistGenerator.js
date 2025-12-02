@@ -252,6 +252,11 @@ export class RSSPlaylistGenerator {
         // Process pairs in sorted order
         for (const pair of allPairs) {
           if (!addedItemGuids.has(pair.itemGuid)) {
+            // Get episode title from feed
+            const episodeTitle = (pair.episodeIndex >= 0 && pair.episodeIndex < feed.items.length)
+              ? feed.items[pair.episodeIndex].title
+              : null;
+
             // Check if this item exists in playlist
             const existingItem = existingItemsMap.get(pair.itemGuid);
             if (existingItem) {
@@ -262,12 +267,20 @@ export class RSSPlaylistGenerator {
               } else {
                 normalizedXml = `      ${normalizedXml}`;
               }
-              allRemoteItems.push(normalizedXml);
+              allRemoteItems.push({
+                xml: normalizedXml,
+                episodeTitle: episodeTitle,
+                episodeIndex: pair.episodeIndex
+              });
               addedItemGuids.add(pair.itemGuid);
               existingEpisodes.push(pair.itemGuid);
             } else {
               // New track from RSS feed
-              allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pair.feedGuid}" itemGuid="${pair.itemGuid}"/>`);
+              allRemoteItems.push({
+                xml: `      <podcast:remoteItem feedGuid="${pair.feedGuid}" itemGuid="${pair.itemGuid}"/>`,
+                episodeTitle: episodeTitle,
+                episodeIndex: pair.episodeIndex
+              });
               addedItemGuids.add(pair.itemGuid);
               newEpisodes.push(pair.itemGuid);
             }
@@ -277,8 +290,8 @@ export class RSSPlaylistGenerator {
         // Log first 13 itemGuids that will be in the final playlist
         if (allRemoteItems.length >= 13) {
           const first13Final = allRemoteItems.slice(0, 13);
-          const first13ItemGuids = first13Final.map(xml => {
-            const match = xml.match(/itemGuid=["']([^"']+)["']/);
+          const first13ItemGuids = first13Final.map(item => {
+            const match = item.xml.match(/itemGuid=["']([^"']+)["']/);
             return match ? match[1] : 'unknown';
           });
           logger.info(`First 13 itemGuids in final playlist: ${first13ItemGuids.join(', ')}`);
@@ -295,11 +308,11 @@ export class RSSPlaylistGenerator {
           try {
             const pairFeedGuid = match[1];
             const pairItemGuid = match[2];
-            
+
             if (!pairFeedGuid || !pairItemGuid) {
               continue;
             }
-            
+
             // Skip if already added from valueTimeSplit
             if (!addedItemGuids.has(pairItemGuid)) {
               const existingItem = existingItemsMap.get(pairItemGuid);
@@ -310,11 +323,19 @@ export class RSSPlaylistGenerator {
                 } else {
                   normalizedXml = `      ${normalizedXml}`;
                 }
-                allRemoteItems.push(normalizedXml);
+                allRemoteItems.push({
+                  xml: normalizedXml,
+                  episodeTitle: null,  // Standalone items don't have episode context
+                  episodeIndex: -1
+                });
                 addedItemGuids.add(pairItemGuid);
                 existingEpisodes.push(pairItemGuid);
               } else {
-                allRemoteItems.push(`      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`);
+                allRemoteItems.push({
+                  xml: `      <podcast:remoteItem feedGuid="${pairFeedGuid}" itemGuid="${pairItemGuid}"/>`,
+                  episodeTitle: null,
+                  episodeIndex: -1
+                });
                 addedItemGuids.add(pairItemGuid);
                 newEpisodes.push(pairItemGuid);
               }
@@ -350,7 +371,11 @@ export class RSSPlaylistGenerator {
             } else {
               normalizedXml = `      ${normalizedXml}`;
             }
-            allRemoteItems.push(normalizedXml);
+            allRemoteItems.push({
+              xml: normalizedXml,
+              episodeTitle: 'Preserved Tracks',  // These are from episodes no longer in RSS feed
+              episodeIndex: 9999  // Put at end
+            });
             preservedFromMissingEpisodes.push(existingItem.itemGuid);
           }
         }
@@ -510,24 +535,48 @@ ${itemsXML}
     } else {
       // Generate remote items only (simplified format like MMT/IAM playlists)
       // Use provided remoteItemsArray if available (merged from existing + new), otherwise generate from feed
-      let remoteItems = [];
-      
+      let remoteItemObjects = [];
+
       if (remoteItemsArray && remoteItemsArray.length > 0) {
-        // Use the merged remoteItems array (new + existing)
-        remoteItems = remoteItemsArray;
+        // Use the merged remoteItems array (new + existing) - now contains objects with episode info
+        remoteItemObjects = remoteItemsArray;
       } else {
         // Fallback: generate from feed items only (for new playlists)
-        for (const episode of feed.items) {
+        for (let i = 0; i < feed.items.length; i++) {
+          const episode = feed.items[i];
           // If episode already has a remoteItem, use it
           if (episode.remoteItem) {
             const feedURL = episode.remoteItem.feedURL || feedConfig.rssUrl;
-            remoteItems.push(`      <podcast:remoteItem feedGuid="${episode.remoteItem.feedGuid}"${feedURL ? ` feedURL="${feedURL}"` : ''} itemGuid="${episode.remoteItem.itemGuid}"/>`);
+            remoteItemObjects.push({
+              xml: `      <podcast:remoteItem feedGuid="${episode.remoteItem.feedGuid}"${feedURL ? ` feedURL="${feedURL}"` : ''} itemGuid="${episode.remoteItem.itemGuid}"/>`,
+              episodeTitle: episode.title,
+              episodeIndex: i
+            });
           } else {
             // Otherwise, create a remote item from the episode guid
             const itemGuid = episode.guid || episode.link;
-            remoteItems.push(`      <podcast:remoteItem feedGuid="${feedGuid}" itemGuid="${itemGuid}"/>`);
+            remoteItemObjects.push({
+              xml: `      <podcast:remoteItem feedGuid="${feedGuid}" itemGuid="${itemGuid}"/>`,
+              episodeTitle: episode.title,
+              episodeIndex: i
+            });
           }
         }
+      }
+
+      // Group tracks by episode and build output with podcast:txt episode markers
+      const groupedOutput = [];
+      let currentEpisodeTitle = null;
+
+      for (const item of remoteItemObjects) {
+        // Check if we need to add an episode header
+        if (item.episodeTitle && item.episodeTitle !== currentEpisodeTitle) {
+          currentEpisodeTitle = item.episodeTitle;
+          // Add episode marker using podcast:txt with purpose="episode"
+          groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(currentEpisodeTitle)}</podcast:txt>`);
+        }
+        // Add the track
+        groupedOutput.push(item.xml);
       }
 
       // Simplified format (remoteItem only, no full item entries)
@@ -546,7 +595,7 @@ ${itemsXML}
     </image>
     <podcast:medium>musicL</podcast:medium>
     <podcast:guid>${guid}</podcast:guid>
-${remoteItems.join('\n')}
+${groupedOutput.join('\n')}
   </channel>
 </rss>`;
     }
@@ -558,6 +607,16 @@ ${remoteItems.join('\n')}
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
+  }
+
+  escapeXml(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 
   ensureDirectoryExists(dir) {
