@@ -564,19 +564,36 @@ ${itemsXML}
         }
       }
 
+      // Build map of episode titles to their tracks
+      const tracksByEpisode = new Map();
+      for (const item of remoteItemObjects) {
+        if (item.episodeTitle) {
+          if (!tracksByEpisode.has(item.episodeTitle)) {
+            tracksByEpisode.set(item.episodeTitle, []);
+          }
+          tracksByEpisode.get(item.episodeTitle).push(item.xml);
+        }
+      }
+
+      // Get all episode titles from feed.items (newest first)
+      // Include episodes even if they have no tracks
+      const allEpisodeTitles = feed.items.map(item => item.title).filter(Boolean);
+
       // Group tracks by episode and build output with podcast:txt episode markers
       const groupedOutput = [];
-      let currentEpisodeTitle = null;
 
-      for (const item of remoteItemObjects) {
-        // Check if we need to add an episode header
-        if (item.episodeTitle && item.episodeTitle !== currentEpisodeTitle) {
-          currentEpisodeTitle = item.episodeTitle;
-          // Add episode marker using podcast:txt with purpose="episode"
-          groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(currentEpisodeTitle)}</podcast:txt>`);
+      for (const episodeTitle of allEpisodeTitles) {
+        // Add episode marker using podcast:txt with purpose="episode"
+        groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(episodeTitle)}</podcast:txt>`);
+
+        const tracks = tracksByEpisode.get(episodeTitle);
+        if (tracks && tracks.length > 0) {
+          // Add all tracks for this episode
+          groupedOutput.push(...tracks);
+        } else {
+          // Episode has no tracks - add comment
+          groupedOutput.push(`    <!-- no tracks -->`);
         }
-        // Add the track
-        groupedOutput.push(item.xml);
       }
 
       // Simplified format (remoteItem only, no full item entries)
