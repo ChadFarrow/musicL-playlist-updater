@@ -24,7 +24,10 @@ export class RSSMonitor {
   loadConfig() {
     try {
       const configData = readFileSync(this.configPath, 'utf8');
-      return JSON.parse(configData);
+      const config = JSON.parse(configData);
+      // Normalize: support both 'feeds' and 'rssFeeds' keys
+      config.feeds = config.feeds || config.rssFeeds || [];
+      return config;
     } catch (error) {
       logger.error('Failed to load config:', error);
       return { feeds: [], settings: {} };
@@ -33,7 +36,13 @@ export class RSSMonitor {
 
   saveConfig() {
     try {
-      writeFileSync(this.configPath, JSON.stringify(this.config, null, 2));
+      // Preserve original structure with rssFeeds key
+      const configToSave = {
+        rssFeeds: this.config.feeds,
+        playlists: this.config.playlists || [],
+        settings: this.config.settings || {}
+      };
+      writeFileSync(this.configPath, JSON.stringify(configToSave, null, 2));
       logger.info('Config saved successfully');
     } catch (error) {
       logger.error('Failed to save config:', error);
