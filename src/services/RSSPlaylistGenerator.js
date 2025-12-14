@@ -137,66 +137,35 @@ export class RSSPlaylistGenerator {
             if (pairFeedGuid && pairItemGuid) {
               // Determine which episode this belongs to by finding the nearest <item> tag
               const matchIndex = match.index;
-              // Find the episode GUID by looking backwards for the most recent <item><guid> tag
+              // Find the episode title by looking backwards for the most recent <item><title> tag
               const beforeMatch = rssXml.substring(0, matchIndex);
-              const itemMatch = beforeMatch.match(/<item[^>]*>[\s\S]*?<guid[^>]*>([^<]+)<\/guid>/gi);
-              let episodeGuid = null;
+              const itemMatch = beforeMatch.match(/<item[^>]*>[\s\S]*?<title[^>]*>([^<]+)<\/title>/gi);
+              let episodeTitle = null;
               let episodeIndex = -1;
-              
+
               if (itemMatch && itemMatch.length > 0) {
                 const lastItem = itemMatch[itemMatch.length - 1];
-                const guidMatch = lastItem.match(/<guid[^>]*>([^<]+)<\/guid>/i);
-                if (guidMatch) {
-                  episodeGuid = guidMatch[1].trim();
-                  // Find episode index in feed.items - try both guid and link fields
+                const titleMatch = lastItem.match(/<title[^>]*>([^<]+)<\/title>/i);
+                if (titleMatch) {
+                  episodeTitle = titleMatch[1].trim();
+                  // Find episode index in feed.items by matching title
                   episodeIndex = feed.items.findIndex(ep => {
-                    const epGuid = ep.guid || ep.link || '';
-                    return epGuid === episodeGuid || epGuid.includes(episodeGuid) || episodeGuid.includes(epGuid);
+                    return ep.title === episodeTitle;
                   });
-                  // If still not found, try matching without whitespace
-                  if (episodeIndex === -1) {
-                    episodeIndex = feed.items.findIndex(ep => {
-                      const epGuid = (ep.guid || ep.link || '').trim();
-                      return epGuid === episodeGuid.trim();
-                    });
-                  }
-                  if (episodeIndex === -1) {
-                    // Try to find by checking if GUID contains episode number (for Episode 109)
-                    const epNumMatch = episodeGuid.match(/109/i);
-                    if (epNumMatch) {
-                      // Episode 109 should be index 0 (newest)
-                      episodeIndex = 0;
-                    } else {
-                      // For HGH, try to match episode GUID by finding similar patterns
-                      // Check feed.items titles for episode numbers
-                      const epTitleMatch = feed.items.findIndex(ep => {
-                        const title = (ep.title || '').toLowerCase();
-                        if (episodeGuid.includes('homegrownhits-109') || episodeGuid.includes('109')) {
-                          return title.includes('109');
-                        }
-                        return false;
-                      });
-                      if (epTitleMatch >= 0) {
-                        episodeIndex = epTitleMatch;
-                      } else {
-                        episodeIndex = feed.items.length; // If not found, put at end
-                      }
-                    }
-                  }
-                  
-                  // Log if episode not found for debugging HGH
-                  if (episodeIndex === feed.items.length && episodeGuid) {
-                    logger.debug(`Could not find episode index for GUID: ${episodeGuid}. Feed has ${feed.items.length} episodes.`);
+
+                  // Log if episode not found for debugging
+                  if (episodeIndex === -1 && episodeTitle) {
+                    logger.debug(`Could not find episode index for title: ${episodeTitle}. Feed has ${feed.items.length} episodes.`);
                   }
                 }
               }
-              
+
               allPairs.push({
                 feedGuid: pairFeedGuid,
                 itemGuid: pairItemGuid,
                 startTime: startTime,
                 episodeIndex: episodeIndex,
-                episodeGuid: episodeGuid,
+                episodeTitle: episodeTitle,
                 matchIndex: matchIndex // Preserve original position in RSS feed
               });
             }
