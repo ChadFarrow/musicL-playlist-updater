@@ -218,42 +218,20 @@ export class RSSPlaylistGenerator {
           logger.info(`First 13 pairs from RSS - itemGuids: ${first13.map(p => p.itemGuid).join(', ')}`);
         }
         
-        // Process pairs in sorted order
+        // Process all pairs (no de-duplication - show every track played)
         for (const pair of allPairs) {
-          if (!addedItemGuids.has(pair.itemGuid)) {
-            // Get episode title from feed
-            const episodeTitle = (pair.episodeIndex >= 0 && pair.episodeIndex < feed.items.length)
-              ? feed.items[pair.episodeIndex].title
-              : null;
+          // Get episode title from feed
+          const episodeTitle = (pair.episodeIndex >= 0 && pair.episodeIndex < feed.items.length)
+            ? feed.items[pair.episodeIndex].title
+            : null;
 
-            // Check if this item exists in playlist
-            const existingItem = existingItemsMap.get(pair.itemGuid);
-            if (existingItem) {
-              // Use existing XML to preserve formatting
-              let normalizedXml = existingItem.xml.trim();
-              if (!normalizedXml.includes('feedGuid')) {
-                normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
-              } else {
-                normalizedXml = `      ${normalizedXml}`;
-              }
-              allRemoteItems.push({
-                xml: normalizedXml,
-                episodeTitle: episodeTitle,
-                episodeIndex: pair.episodeIndex
-              });
-              addedItemGuids.add(pair.itemGuid);
-              existingEpisodes.push(pair.itemGuid);
-            } else {
-              // New track from RSS feed
-              allRemoteItems.push({
-                xml: `      <podcast:remoteItem feedGuid="${pair.feedGuid}" itemGuid="${pair.itemGuid}"/>`,
-                episodeTitle: episodeTitle,
-                episodeIndex: pair.episodeIndex
-              });
-              addedItemGuids.add(pair.itemGuid);
-              newEpisodes.push(pair.itemGuid);
-            }
-          }
+          // Add track from RSS feed
+          allRemoteItems.push({
+            xml: `      <podcast:remoteItem feedGuid="${pair.feedGuid}" itemGuid="${pair.itemGuid}"/>`,
+            episodeTitle: episodeTitle,
+            episodeIndex: pair.episodeIndex
+          });
+          newEpisodes.push(pair.itemGuid);
         }
         
         // Log first 13 itemGuids that will be in the final playlist
