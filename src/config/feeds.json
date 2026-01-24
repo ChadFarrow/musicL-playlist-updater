@@ -10,7 +10,7 @@
       "playlistAuthor": "ChadFarrow",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/HGH-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:10.751Z",
+      "lastChecked": "2026-01-24T07:20:33.726Z",
       "lastEpisodeGuid": "2d1f66bd-829c-4852-867e-7d3904485b12",
       "checkIntervalMinutes": 1440
     },
@@ -24,7 +24,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/ITDV-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:14.636Z",
+      "lastChecked": "2026-01-24T07:20:34.878Z",
       "lastEpisodeGuid": "f1bbe078-29ac-48f7-b783-a3b3805a4bd0",
       "checkIntervalMinutes": 1440
     },
@@ -38,7 +38,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/IAM-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:14.187Z",
+      "lastChecked": "2026-01-24T07:20:34.408Z",
       "lastEpisodeGuid": "933784bc-1711-4f69-a228-20370812ecaf",
       "checkIntervalMinutes": 1440
     },
@@ -52,8 +52,8 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/MMM-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:15.594Z",
-      "lastEpisodeGuid": "83b51f01-ae07-4e53-bfbb-01e34e6956d3",
+      "lastChecked": "2026-01-24T07:20:36.073Z",
+      "lastEpisodeGuid": "3fd9f9c8-6a85-41b3-9546-1b1ecaa20383",
       "checkIntervalMinutes": 1440
     },
     {
@@ -66,7 +66,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/MMT-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:16.053Z",
+      "lastChecked": "2026-01-24T07:20:40.021Z",
       "lastEpisodeGuid": "13c170a1-e33c-4042-8285-6b3226ea3ceb",
       "checkIntervalMinutes": 1440
     },
@@ -80,7 +80,7 @@
       "playlistAuthor": "Auto musicL Maker",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/SAS-playlist-art%20.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:16.578Z",
+      "lastChecked": "2026-01-24T07:20:40.657Z",
       "lastEpisodeGuid": "9e4cf05d-4330-47e9-93cc-121b569a8db3",
       "checkIntervalMinutes": 1440
     },
@@ -94,7 +94,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/b4ts-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:17.052Z",
+      "lastChecked": "2026-01-24T07:20:41.238Z",
       "lastEpisodeGuid": "9a538ce2-a1f4-4dff-af83-03d5119deca5",
       "checkIntervalMinutes": 1440
     },
@@ -122,7 +122,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/UpBEATs-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-01-23T07:26:17.829Z",
+      "lastChecked": "2026-01-24T07:20:42.058Z",
       "lastEpisodeGuid": "75c3b038-aa26-51fc-bec9-b0ee439139ef",
       "checkIntervalMinutes": 1440
     },
@@ -137,7 +137,7 @@
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/LT-music-playlist.png",
       "enabled": true,
       "checkIntervalMinutes": 1440,
-      "lastChecked": "2026-01-23T07:26:15.314Z",
+      "lastChecked": "2026-01-24T07:20:35.716Z",
       "lastEpisodeGuid": "8c4eec8b-deec-4819-9117-8dd7449575c6"
     }
   ],
