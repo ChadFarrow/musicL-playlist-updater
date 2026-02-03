@@ -45,15 +45,15 @@
     {
       "id": "MMM-music-playlist-feed",
       "name": "Mutton, Mead & Music Playlist",
-      "rssUrl": "https://mmmusic-project.ams3.cdn.digitaloceanspaces.com/Mutton_Mead__Music/feed.xml",
+      "rssUrl": "https://mmmusic.show/podcast/feed.xml",
       "playlistId": "MMM-music-playlist",
       "playlistTitle": "Mutton, Mead & Music Playlist",
       "playlistDescription": "Curated playlist from Mutton, Mead & Music podcast featuring Value4Value independent artists",
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/MMM-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-02-02T07:50:18.886Z",
-      "lastEpisodeGuid": "3fd9f9c8-6a85-41b3-9546-1b1ecaa20383",
+      "lastChecked": "2026-02-03T00:06:33.339Z",
+      "lastEpisodeGuid": "0228b1ca-e486-4bc1-91cf-59757879ee11",
       "checkIntervalMinutes": 1440
     },
     {
