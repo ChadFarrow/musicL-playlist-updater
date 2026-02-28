@@ -142,7 +142,7 @@ export class RSSPlaylistGenerator {
                 const lastItem = itemMatch[itemMatch.length - 1];
                 const titleMatch = lastItem.match(/<title[^>]*>([^<]+)<\/title>/i);
                 if (titleMatch) {
-                  episodeTitle = titleMatch[1].trim();
+                  episodeTitle = this.decodeXmlEntities(titleMatch[1].trim());
                   // Find episode index in feed.items by matching title
                   episodeIndex = feed.items.findIndex(ep => {
                     return ep.title === episodeTitle;
@@ -508,6 +508,20 @@ ${groupedOutput.join('\n')}
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&apos;');
+  }
+
+  decodeXmlEntities(text) {
+    if (!text) return '';
+    return text
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#39;/g, "'")
+      .replace(/&#x27;/g, "'")
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+      .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
   }
 
   ensureDirectoryExists(dir) {
