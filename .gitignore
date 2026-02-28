@@ -1,6 +1,9 @@
 # Configuration files with secrets
 config.json
 
+# Generated playlists (synced to target repo via API)
+playlists/
+
 # Logs
 logs/
 *.log
