@@ -36,22 +36,24 @@ node scripts/daily-update.js
 
 ### Entry Point & CLI
 
-`src/index.js` - Contains `MusicLPlaylistUpdater` class and CLI dispatch (`process.argv` switch). All CLI commands route through this file.
+`src/index.js` - Contains `MusicLPlaylistUpdater` class and CLI dispatch (`process.argv` switch). All CLI commands route through this file. The `check-feed` command uses `RSSPlaylistGenerator` (same as daily CI) to ensure consistent remoteItem-only output.
 
 ### Three Operating Modes
 
 Set in `src/config/feeds.json` under `settings.monitorMode`:
 
-- **`rss`** - Monitor RSS feeds directly, detect new episodes by GUID comparison, generate full-item XML playlists
+- **`rss`** - Monitor RSS feeds directly, detect new episodes by GUID comparison
 - **`playlist`** - Monitor existing GitHub playlists for changes using ETags
-- **`rss-to-playlist`** (current production mode) - Parse RSS feeds, extract `podcast:valueTimeSplit` / `podcast:remoteItem` tags from raw XML, generate simplified remoteItem-only musicL playlists
+- **`rss-to-playlist`** (current production mode) - Parse RSS feeds, extract `podcast:valueTimeSplit` / `podcast:remoteItem` tags from raw XML, generate remoteItem-only musicL playlists
+
+All modes generate the same **remoteItem-only** playlist format (no full-items code path exists).
 
 ### Core Services (`src/services/`)
 
 - **`Scheduler.js`** - Cron-based job orchestration via `node-cron`. Creates per-feed jobs based on `checkIntervalMinutes`. Delegates to the appropriate service based on `monitorMode`.
 - **`RSSMonitor.js`** - Parses RSS with Podcasting 2.0 custom fields (`podcast:remoteItem`, `podcast:value`). Detects new episodes by comparing GUIDs against `lastEpisodeGuid`. Reads/writes `feeds.json` directly.
-- **`RSSPlaylistGenerator.js`** - The main playlist generator for `rss-to-playlist` mode. Fetches raw RSS XML and uses regex to extract `feedGuid`/`itemGuid` pairs from `podcast:valueTimeSplit` tags in document order. Merges with existing playlist content from GitHub. Handles two output formats: `full-items` (complete RSS items) and `remoteItem-only` (simplified format with `podcast:txt` episode markers).
-- **`PlaylistUpdater.js`** - Generates full-item musicL XML playlists (used in `rss` mode). Simpler than RSSPlaylistGenerator.
+- **`RSSPlaylistGenerator.js`** - The main playlist generator. Used by both `rss-to-playlist` mode and `check-feed` CLI command. Fetches raw RSS XML and uses regex to extract `feedGuid`/`itemGuid` pairs from `podcast:valueTimeSplit` tags in document order. Merges with existing playlist content from GitHub. Always generates remoteItem-only format with `podcast:txt purpose="episode"` markers.
+- **`PlaylistUpdater.js`** - Legacy service, no longer used by any active code path. Kept for reference only.
 - **`GitHubSync.js`** - GitHub Contents API integration. Handles file read/write/list operations on the target repo. Also parses `FEEDS.md` from the target repo to discover which playlists to manage, and parses playlist XML to extract `podcast:txt purpose="source-feed"` URLs.
 - **`PlaylistDiscovery.js`** - Discovers playlists by listing XML files in the target repo's `/docs` folder via GitHub API.
 - **`PlaylistMonitor.js`** - Monitors playlist changes from GitHub using ETags (used in `playlist` mode).
@@ -113,3 +115,5 @@ When adding a new feed, three things must be done for the daily CI to pick it up
 1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`
 2. **Add entry to `FEEDS.md` in the target repo** (`chadf-musicl-playlists`) — the daily script reads this as the source of truth
 3. **Seed an initial playlist XML in the target repo** (`docs/{playlistId}.xml`) — the daily script's `discoverPlaylists()` only matches feeds that already have an XML file in `docs/`, and it requires a `<podcast:txt purpose="source-feed">` tag in the XML to extract the RSS URL. Without this, the feed silently gets skipped even if it's in `FEEDS.md`
+
+**Important**: Use `npm start check-feed <id>` (with GitHub sync enabled) or the daily CI with `FORCE_UPDATE=true` to generate the seed playlist. Both use `RSSPlaylistGenerator` which always produces the correct remoteItem-only format. Never manually create seed playlists with `<item>` tags — there is no full-items code path and the system only extracts `<podcast:remoteItem>` entries from existing playlists.
