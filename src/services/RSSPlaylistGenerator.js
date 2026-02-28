@@ -64,7 +64,6 @@ export class RSSPlaylistGenerator {
 
       // Get existing playlist and merge with new episodes
       let existingContent = null;
-      let existingPlaylistFormat = null;
       let existingRemoteItems = [];
       const existingItemsMap = new Map(); // itemGuid -> existing remoteItem
       
@@ -74,13 +73,8 @@ export class RSSPlaylistGenerator {
           if (this.githubSync) {
             existingContent = await this.githubSync.getFileContent(`docs/${feedConfig.playlistId}.xml`);
             if (existingContent) {
-              // Detect format: has <item> tags or just remoteItem entries
-              const hasItemTags = /<item[^>]*>/.test(existingContent);
-              existingPlaylistFormat = hasItemTags ? 'full-items' : 'remoteItem-only';
-              logger.info(`Detected existing playlist format: ${existingPlaylistFormat}`);
-              
-              // Extract existing remoteItems to preserve them
-              if (existingPlaylistFormat === 'remoteItem-only') {
+              // Always extract existing remoteItems to preserve them
+              {
                 // Match remoteItem tags (may span multiple lines or be on single line)
                 const remoteItemRegex = /<podcast:remoteItem[^>]*\/>/g;
                 let match;
@@ -101,6 +95,7 @@ export class RSSPlaylistGenerator {
                 logger.info(`Found ${existingRemoteItems.length} existing remoteItems in playlist`);
               }
             }
+
           }
         } catch (error) {
           logger.debug(`Could not check existing playlist: ${error.message}`);
@@ -337,8 +332,8 @@ export class RSSPlaylistGenerator {
         return { success: false, error: 'No tracks found in playlist or RSS feed' };
       }
 
-      // Generate musicL playlist XML (preserving existing format)
-      const playlistXML = this.generateMusicLXML(feed, feedConfig, existingPlaylistFormat, allRemoteItems);
+      // Generate musicL playlist XML (always remoteItem-only format)
+      const playlistXML = this.generateMusicLXML(feed, feedConfig, allRemoteItems);
       
       // Save locally
       const localPath = join(this.config.playlistsDir || './playlists', `${feedConfig.playlistId}.xml`);
@@ -407,144 +402,77 @@ export class RSSPlaylistGenerator {
     }
   }
 
-  generateMusicLXML(feed, feedConfig, existingFormat = null, remoteItemsArray = null) {
+  generateMusicLXML(feed, feedConfig, remoteItemsArray = null) {
     const guid = feedConfig.playlistGuid || this.generateGUID();
     const pubDate = new Date().toUTCString();
-    
+
     // Get feed GUID (prefer existing from feed, or use config, or generate new)
     const feedGuid = feed.guid || feedConfig.feedGuid || this.generateGUID();
-    
-    // Default to remoteItem-only format (like MMT/IAM) unless existing format is detected
-    const useFullItems = existingFormat === 'full-items';
-    
-    if (useFullItems) {
-      // Generate full item entries with all metadata (like HGH playlist)
-      const itemsXML = feed.items.map(episode => {
-        const itemGuid = episode.guid || episode.link;
-        let itemXML = `    <item>
-      <title><![CDATA[${episode.title || ''}]]></title>
-      <guid isPermaLink="false">${itemGuid}</guid>
-      <link>${episode.link || ''}</link>
-      <pubDate>${episode.pubDate || pubDate}</pubDate>
-      <description><![CDATA[${episode.content || episode.contentSnippet || episode.description || ''}]]></description>`;
 
-        // Add enclosure if available
-        if (episode.enclosure) {
-          itemXML += `
-      <enclosure url="${episode.enclosure.url}" type="${episode.enclosure.type || 'audio/mpeg'}" length="${episode.enclosure.length || 0}"/>`;
-        }
+    // Generate remote items only (remoteItem-only format like HGH/MMT/IAM playlists)
+    // Use provided remoteItemsArray if available (merged from existing + new), otherwise generate from feed
+    let remoteItemObjects = [];
 
-        // Add value tags if available
-        if (episode.value) {
-          const valueType = episode.valueType || 'lightning';
-          const valueMethod = episode.valueMethod || 'keysend';
-          const recipients = episode.valueRecipient || [];
-          
-          if (recipients.length > 0 || episode.valueRecipient) {
-            const recipient = Array.isArray(recipients) ? recipients[0] : recipients;
-            itemXML += `
-      <podcast:value type="${valueType}" method="${valueMethod}">
-        <podcast:valueRecipient name="${recipient.name || ''}" type="${recipient.type || 'node'}" address="${recipient.address || ''}" split="${recipient.split || 0}"/>
-      </podcast:value>`;
-          }
-        }
-
-        itemXML += `
-    </item>`;
-        return itemXML;
-      }).join('\n');
-
-      // Full RSS 2.0 format with itunes namespace
-      return `<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:podcast="https://podcastindex.org/namespace/1.0" version="2.0">
-  <channel>
-    <title><![CDATA[${feedConfig.playlistTitle}]]></title>
-    <link>${feed.link || feedConfig.rssUrl}</link>
-    <podcast:txt purpose="source-rss">${feedConfig.rssUrl}</podcast:txt>
-    <description><![CDATA[${feedConfig.playlistDescription}]]></description>
-    <language>en-us</language>
-    <copyright><![CDATA[${feedConfig.playlistAuthor}]]></copyright>
-    <managingEditor>${feedConfig.playlistAuthor}</managingEditor>
-    <pubDate>${pubDate}</pubDate>
-    <lastBuildDate>${pubDate}</lastBuildDate>
-    <generator>Auto musicL Maker</generator>
-    <docs>https://cyber.harvard.edu/rss/rss.html</docs>
-    <image>
-      <url>${feedConfig.playlistImageUrl || feed.image?.url || ''}</url>
-      <title><![CDATA[${feedConfig.playlistTitle}]]></title>
-      <link>${feed.link || feedConfig.rssUrl}</link>
-    </image>
-    <podcast:medium>musicL</podcast:medium>
-    <podcast:guid>${guid}</podcast:guid>
-${itemsXML}
-  </channel>
-</rss>`;
+    if (remoteItemsArray && remoteItemsArray.length > 0) {
+      // Use the merged remoteItems array (new + existing) - now contains objects with episode info
+      remoteItemObjects = remoteItemsArray;
     } else {
-      // Generate remote items only (simplified format like MMT/IAM playlists)
-      // Use provided remoteItemsArray if available (merged from existing + new), otherwise generate from feed
-      let remoteItemObjects = [];
-
-      if (remoteItemsArray && remoteItemsArray.length > 0) {
-        // Use the merged remoteItems array (new + existing) - now contains objects with episode info
-        remoteItemObjects = remoteItemsArray;
-      } else {
-        // Fallback: generate from feed items only (for new playlists)
-        for (let i = 0; i < feed.items.length; i++) {
-          const episode = feed.items[i];
-          // If episode already has a remoteItem, use it
-          if (episode.remoteItem) {
-            const feedURL = episode.remoteItem.feedURL || feedConfig.rssUrl;
-            remoteItemObjects.push({
-              xml: `      <podcast:remoteItem feedGuid="${episode.remoteItem.feedGuid}"${feedURL ? ` feedURL="${feedURL}"` : ''} itemGuid="${episode.remoteItem.itemGuid}"/>`,
-              episodeTitle: episode.title,
-              episodeIndex: i
-            });
-          } else {
-            // Otherwise, create a remote item from the episode guid
-            const itemGuid = episode.guid || episode.link;
-            remoteItemObjects.push({
-              xml: `      <podcast:remoteItem feedGuid="${feedGuid}" itemGuid="${itemGuid}"/>`,
-              episodeTitle: episode.title,
-              episodeIndex: i
-            });
-          }
-        }
-      }
-
-      // Build map of episode titles to their tracks
-      const tracksByEpisode = new Map();
-      for (const item of remoteItemObjects) {
-        if (item.episodeTitle) {
-          if (!tracksByEpisode.has(item.episodeTitle)) {
-            tracksByEpisode.set(item.episodeTitle, []);
-          }
-          tracksByEpisode.get(item.episodeTitle).push(item.xml);
-        }
-      }
-
-      // Get all episode titles from feed.items (newest first)
-      // Include episodes even if they have no tracks
-      const allEpisodeTitles = feed.items.map(item => item.title).filter(Boolean);
-
-      // Group tracks by episode and build output with podcast:txt episode markers
-      const groupedOutput = [];
-
-      for (const episodeTitle of allEpisodeTitles) {
-        // Add episode marker using podcast:txt with purpose="episode"
-        groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(episodeTitle)}</podcast:txt>`);
-
-        const tracks = tracksByEpisode.get(episodeTitle);
-        if (tracks && tracks.length > 0) {
-          // Add all tracks for this episode
-          groupedOutput.push(...tracks);
+      // Fallback: generate from feed items only (for new playlists)
+      for (let i = 0; i < feed.items.length; i++) {
+        const episode = feed.items[i];
+        // If episode already has a remoteItem, use it
+        if (episode.remoteItem) {
+          const feedURL = episode.remoteItem.feedURL || feedConfig.rssUrl;
+          remoteItemObjects.push({
+            xml: `      <podcast:remoteItem feedGuid="${episode.remoteItem.feedGuid}"${feedURL ? ` feedURL="${feedURL}"` : ''} itemGuid="${episode.remoteItem.itemGuid}"/>`,
+            episodeTitle: episode.title,
+            episodeIndex: i
+          });
         } else {
-          // Episode has no tracks - add comment
-          groupedOutput.push(`    <!-- no tracks -->`);
+          // Otherwise, create a remote item from the episode guid
+          const itemGuid = episode.guid || episode.link;
+          remoteItemObjects.push({
+            xml: `      <podcast:remoteItem feedGuid="${feedGuid}" itemGuid="${itemGuid}"/>`,
+            episodeTitle: episode.title,
+            episodeIndex: i
+          });
         }
       }
+    }
 
-      // Simplified format (remoteItem only, no full item entries)
-      return `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+    // Build map of episode titles to their tracks
+    const tracksByEpisode = new Map();
+    for (const item of remoteItemObjects) {
+      if (item.episodeTitle) {
+        if (!tracksByEpisode.has(item.episodeTitle)) {
+          tracksByEpisode.set(item.episodeTitle, []);
+        }
+        tracksByEpisode.get(item.episodeTitle).push(item.xml);
+      }
+    }
+
+    // Get all episode titles from feed.items (newest first)
+    // Include episodes even if they have no tracks
+    const allEpisodeTitles = feed.items.map(item => item.title).filter(Boolean);
+
+    // Group tracks by episode and build output with podcast:txt episode markers
+    const groupedOutput = [];
+
+    for (const episodeTitle of allEpisodeTitles) {
+      // Add episode marker using podcast:txt with purpose="episode"
+      groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(episodeTitle)}</podcast:txt>`);
+
+      const tracks = tracksByEpisode.get(episodeTitle);
+      if (tracks && tracks.length > 0) {
+        // Add all tracks for this episode
+        groupedOutput.push(...tracks);
+      } else {
+        // Episode has no tracks - add comment
+        groupedOutput.push(`    <!-- no tracks -->`);
+      }
+    }
+
+    return `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
     <author>${feedConfig.playlistAuthor || 'ChadF'}</author>
     <title>${feedConfig.playlistTitle || ''}</title>
@@ -562,7 +490,6 @@ ${itemsXML}
 ${groupedOutput.join('\n')}
   </channel>
 </rss>`;
-    }
   }
 
   generateGUID() {

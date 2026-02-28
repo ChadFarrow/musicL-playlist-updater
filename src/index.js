@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 import { Scheduler } from './services/Scheduler.js';
 import { RSSMonitor } from './services/RSSMonitor.js';
-import { PlaylistUpdater } from './services/PlaylistUpdater.js';
 import { PlaylistDiscovery } from './services/PlaylistDiscovery.js';
 import { logger } from './utils/logger.js';
 
@@ -138,21 +137,22 @@ class MusicLPlaylistUpdater {
     try {
       const rssMonitor = new RSSMonitor();
       const feed = rssMonitor.getFeed(feedId);
-      
+
       if (!feed) {
         throw new Error(`Feed not found: ${feedId}`);
       }
 
-      const result = await rssMonitor.checkFeed(feed);
-      
-      if (result.hasNewEpisodes) {
-        logger.info(`New episodes found for ${feed.name}`);
-        const playlistUpdater = new PlaylistUpdater(this.config.playlistsDir);
-        await playlistUpdater.updatePlaylist(feed, result.newEpisodes, result.feedInfo);
+      // Use RSSPlaylistGenerator (remoteItem-only format) — same as daily CI
+      const { RSSPlaylistGenerator } = await import('./services/RSSPlaylistGenerator.js');
+      const generator = new RSSPlaylistGenerator(this.config);
+      const result = await generator.generatePlaylistFromRSS(feed);
+
+      if (result.success) {
+        logger.info(`Playlist generated for ${feed.name}: ${result.episodeCount} tracks (${result.newEpisodeCount} new)`);
       } else {
-        logger.info(`No new episodes for ${feed.name}`);
+        logger.warn(`No updates for ${feed.name}: ${result.error}`);
       }
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to check feed:', error);
