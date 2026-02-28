@@ -148,7 +148,7 @@
       "playlistTitle": "Two for Tunestr Music Playlist",
       "playlistDescription": "Every music reference from Two for Tunestr",
       "playlistAuthor": "ChadF",
-      "playlistImageUrl": "",
+      "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/TFT-playlist-art.png",
       "enabled": true,
       "lastChecked": null,
       "lastEpisodeGuid": null,
