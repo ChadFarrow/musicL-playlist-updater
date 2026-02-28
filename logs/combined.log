@@ -485,3 +485,17 @@
 {"level":"info","message":"Successfully updated docs/flowgnar-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:46.143Z"}
 {"level":"info","message":"Restored docs/flowgnar-music-playlist.xml from commit 153be3251ef659a8ba66769dc7e303fbbd7ccee0","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:46.143Z"}
 {"level":"info","message":"Successfully updated docs/upbeats-music-playlist.xml on GitHub","service":"musicl-playlist-updater","timestamp":"2025-11-01T18:59:47.113Z"}
+{"level":"warn","message":"No config.json found, using defaults","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:32.069Z"}
+{"level":"info","message":"Checking feed: Mutton, Mead & Music Playlist (https://mmmusic.show/podcast/feed.xml)","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:32.073Z"}
+{"level":"info","message":"New episode detected in Mutton, Mead & Music Playlist: 124th Edition","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:33.339Z"}
+{"level":"info","message":"Config saved successfully","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:33.340Z"}
+{"level":"info","message":"New episodes found for Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:33.340Z"}
+{"level":"info","message":"Updating playlist for feed: Mutton, Mead & Music Playlist","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:33.340Z"}
+{"level":"info","message":"Playlist updated: playlists/MMM-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2026-02-03T00:06:33.343Z"}
+{"level":"warn","message":"No config.json found, using defaults","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.250Z"}
+{"level":"info","message":"Checking feed: Two for Tunestr (https://feeds.rssblue.com/too-angry-cunts)","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.253Z"}
+{"level":"info","message":"New episode detected in Two for Tunestr: It's A 3- Peat","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.743Z"}
+{"level":"info","message":"Config saved successfully","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.744Z"}
+{"level":"info","message":"New episodes found for Two for Tunestr","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.744Z"}
+{"level":"info","message":"Updating playlist for feed: Two for Tunestr","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.744Z"}
+{"level":"info","message":"Playlist updated: playlists/TFT-music-playlist.xml","service":"musicl-playlist-updater","timestamp":"2026-02-28T21:49:51.745Z"}

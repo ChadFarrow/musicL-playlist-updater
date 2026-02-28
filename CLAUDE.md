@@ -97,10 +97,19 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 - ES Module project (`"type": "module"`) requiring Node >= 18.0.0
 - No test files currently exist (test glob `src/**/*.test.js` matches nothing)
-- Playlists output locally to `./playlists/{playlistId}.xml`, then synced to target repo `docs/` via GitHub Contents API
+- Playlists output locally to `./playlists/{playlistId}.xml` (gitignored), then synced to target repo `docs/` via GitHub Contents API
+- The `playlists/` directory is a local temp workspace only — playlist XML files are NOT tracked in this repo, they live exclusively in the target repo (`chadf-musicl-playlists/docs/`)
 - Only `feeds.json` changes are git-committed in CI; playlist XML files are pushed to the separate target repo via API
 - Logs written to `./logs/combined.log` and `./logs/error.log` (Winston)
 - GitHub Actions workflow (`.github/workflows/daily-feed-update.yml`) runs daily at 7 AM UTC (2 AM EST)
 - RSSMonitor normalizes both `feeds` and `rssFeeds` keys in config
 - Generated playlists use `<podcast:medium>musicL</podcast:medium>` and group tracks by episode using `<podcast:txt purpose="episode">` markers
 - The `FEEDS.md` file in the target repo serves as the source of truth for which playlists to manage; `feeds.json` is the fallback
+
+## Adding a New Feed
+
+When adding a new feed, three things must be done for the daily CI to pick it up:
+
+1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`
+2. **Add entry to `FEEDS.md` in the target repo** (`chadf-musicl-playlists`) — the daily script reads this as the source of truth
+3. **Seed an initial playlist XML in the target repo** (`docs/{playlistId}.xml`) — the daily script's `discoverPlaylists()` only matches feeds that already have an XML file in `docs/`, and it requires a `<podcast:txt purpose="source-feed">` tag in the XML to extract the RSS URL. Without this, the feed silently gets skipped even if it's in `FEEDS.md`
