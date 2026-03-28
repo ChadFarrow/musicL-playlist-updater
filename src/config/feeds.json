@@ -115,7 +115,7 @@
     {
       "id": "upbeats-music-playlist-feed",
       "name": "UpBeats Music Playlist",
-      "rssUrl": "https://feeds.rssblue.com/upbeats",
+      "rssUrl": "https://serve.podhome.fm/rss/3aebb7a8-5942-5ee7-a148-8bdc14f1f3d4",
       "playlistId": "upbeats-music-playlist",
       "playlistTitle": "UpBeats Music Playlist",
       "playlistDescription": "Every music reference from UpBEATs",
@@ -143,7 +143,7 @@
     {
       "id": "two-for-tunestr-feed",
       "name": "Two for Tunestr",
-      "rssUrl": "https://feeds.rssblue.com/too-angry-cunts",
+      "rssUrl": "https://serve.podhome.fm/rss/fafd2bfc-98ac-5010-9fcb-7403abfd420a",
       "playlistId": "TFT-music-playlist",
       "playlistTitle": "Two for Tunestr Music Playlist",
       "playlistDescription": "Every music reference from Two for Tunestr",
