@@ -6,7 +6,7 @@ import { join } from 'path';
 console.log('🔄 Updating upbeats playlist with correct RSS feed URL...\n');
 
 const playlistFile = './playlists/upbeats-music-playlist.xml';
-const correctRSSUrl = 'https://feeds.rssblue.com/upbeats';
+const correctRSSUrl = 'https://serve.podhome.fm/rss/3aebb7a8-5942-5ee7-a148-8bdc14f1f3d4';
 
 try {
   // Read the current playlist

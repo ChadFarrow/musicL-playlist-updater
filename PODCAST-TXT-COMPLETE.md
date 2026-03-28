@@ -20,7 +20,7 @@ The podcast:txt tag implementation is now **COMPLETE**! All 9 playlists now have
    - **Source**: Flowgnar Podcast
    - **Type**: Music podcast
 
-4. **upbeats-music-playlist** → `https://feeds.rssblue.com/upbeats`
+4. **upbeats-music-playlist** → `https://serve.podhome.fm/rss/3aebb7a8-5942-5ee7-a148-8bdc14f1f3d4`
    - **Source**: UpBEATs with Salty Crayon
    - **Type**: Value4Value music podcast
 
