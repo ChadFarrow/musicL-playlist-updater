@@ -77,6 +77,8 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 `scripts/daily-update.js` - Used by GitHub Actions CI. Loads feeds from `FEEDS.md` in the target repo (with fallback to `feeds.json`), checks each for updates, generates playlists, and saves updated config. This is the primary production entry point.
 
+**Transient error tolerance**: Each feed's check/generation runs inside `withRetry` (`src/utils/retry.js`) — up to 2 retries, 10s apart. 403/404 access errors are not retried (treated as non-fatal skips). The run exits 0 as long as at least one feed processed cleanly; feeds that still fail after retries emit `::warning::` annotations on the Actions run instead of failing it. Exit 1 only when every feed errors or a fatal error occurs (unreadable config, etc.). Design doc: `docs/superpowers/specs/2026-07-03-transient-feed-error-tolerance-design.md`.
+
 ## Configuration
 
 **Feed Config**: `src/config/feeds.json`
@@ -98,7 +100,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 ## Key Details
 
 - ES Module project (`"type": "module"`) requiring Node >= 18.0.0
-- No test files currently exist (test glob `src/**/*.test.js` matches nothing)
+- Tests use the Node built-in test runner (`npm test` runs `src/**/*.test.js`); currently `src/utils/retry.test.js`
 - Playlists output locally to `./playlists/{playlistId}.xml` (gitignored), then synced to target repo `docs/` via GitHub Contents API
 - The `playlists/` directory is a local temp workspace only — playlist XML files are NOT tracked in this repo, they live exclusively in the target repo (`chadf-musicl-playlists/docs/`)
 - Only `feeds.json` changes are git-committed in CI; playlist XML files are pushed to the separate target repo via API
