@@ -3,6 +3,28 @@ import { join } from 'path';
 import { RSSPlaylistGenerator } from '../src/services/RSSPlaylistGenerator.js';
 import { GitHubSync } from '../src/services/GitHubSync.js';
 import { logger } from '../src/utils/logger.js';
+import { withRetry } from '../src/utils/retry.js';
+
+const FEED_RETRIES = 2;
+const FEED_RETRY_DELAY_MS = 10000;
+
+// 403/404-style errors won't clear on retry and shouldn't fail the run
+function isAccessError(error) {
+  return !!error.message && (
+    error.message.includes('Status code 403') ||
+    error.message.includes('Status code 404') ||
+    error.message.includes('403') ||
+    error.message.includes('404') ||
+    error.message.includes('Forbidden') ||
+    error.message.includes('Not Found')
+  );
+}
+
+// Surface a warning annotation on the GitHub Actions run summary page
+function emitWorkflowWarning(feedName, error) {
+  const message = `${feedName}: ${error.message}`.replace(/\r?\n/g, ' ');
+  console.log(`::warning title=Feed update failed::${message}`);
+}
 
 // Load configuration (optional - use environment variables if config.json doesn't exist)
 let config = {};
@@ -211,65 +233,74 @@ async function updateAllFeeds() {
     
     let updatedCount = 0;
     let errorCount = 0;
-    
+    let processedCount = 0;
+
     // Update feeds from FEEDS.md (or configured feeds if FEEDS.md unavailable)
     for (const feedConfig of feedsToUpdate) {
+      const feedName = feedConfig.name || feedConfig.playlistId;
       try {
-        logger.info(`Checking feed: ${feedConfig.name || feedConfig.playlistId}`);
-        
+        logger.info(`Checking feed: ${feedName}`);
+
         if (!feedConfig.rssUrl) {
           logger.warn(`Skipping ${feedConfig.playlistId}: No RSS URL configured`);
           errorCount++;
           continue;
         }
-        
-        // Check for updates
-        const checkResult = await rssPlaylistGenerator.checkFeedForUpdates(feedConfig);
-        
-        // Force update if lastEpisodeGuid is null (first time) or if explicitly requested
-        const forceUpdate = !feedConfig.lastEpisodeGuid || process.env.FORCE_UPDATE === 'true';
-        
-        if (checkResult.hasUpdates || forceUpdate) {
-          if (forceUpdate && !checkResult.hasUpdates) {
-            logger.info(`Forcing update for ${feedConfig.name || feedConfig.playlistId} (first time or forced)`);
-          } else {
-            logger.info(`New episodes found in ${feedConfig.name || feedConfig.playlistId}, generating playlist`);
-          }
-          
-          // Generate playlist from RSS feed
-          const playlistResult = await rssPlaylistGenerator.generatePlaylistFromRSS(feedConfig);
-          
-          if (playlistResult.success) {
+
+        // Transient errors (timeouts, network blips) get retried before counting as failures
+        const outcome = await withRetry(async () => {
+          // Check for updates
+          const checkResult = await rssPlaylistGenerator.checkFeedForUpdates(feedConfig);
+
+          // Force update if lastEpisodeGuid is null (first time) or if explicitly requested
+          const forceUpdate = !feedConfig.lastEpisodeGuid || process.env.FORCE_UPDATE === 'true';
+
+          if (checkResult.hasUpdates || forceUpdate) {
+            if (forceUpdate && !checkResult.hasUpdates) {
+              logger.info(`Forcing update for ${feedName} (first time or forced)`);
+            } else {
+              logger.info(`New episodes found in ${feedName}, generating playlist`);
+            }
+
+            // Generate playlist from RSS feed
+            const playlistResult = await rssPlaylistGenerator.generatePlaylistFromRSS(feedConfig);
+
+            if (!playlistResult.success) {
+              throw new Error(`Failed to generate playlist for ${feedName}`);
+            }
+
             logger.info(`Successfully updated playlist: ${playlistResult.episodeCount} episodes`);
             logger.info(`Latest episode: ${playlistResult.lastEpisode}`);
-            updatedCount++;
-          } else {
-            logger.error(`Failed to generate playlist for ${feedConfig.name || feedConfig.playlistId}`);
-            errorCount++;
+            return 'updated';
           }
-        } else {
-          logger.info(`No new episodes in ${feedConfig.name || feedConfig.playlistId}`);
+
+          logger.info(`No new episodes in ${feedName}`);
+          return 'no-updates';
+        }, {
+          retries: FEED_RETRIES,
+          delayMs: FEED_RETRY_DELAY_MS,
+          shouldRetry: (error) => !isAccessError(error),
+          onRetry: (error, attempt) => {
+            logger.warn(`Retry ${attempt}/${FEED_RETRIES} for ${feedName} after error: ${error.message}`);
+          }
+        });
+
+        if (outcome === 'updated') {
+          updatedCount++;
         }
-        
+        processedCount++;
+
       } catch (error) {
-        // Check if error is a 403/404 (access denied/not found) - these are not fatal
-        const isAccessError = error.message && (
-          error.message.includes('Status code 403') ||
-          error.message.includes('Status code 404') ||
-          error.message.includes('403') ||
-          error.message.includes('404') ||
-          error.message.includes('Forbidden') ||
-          error.message.includes('Not Found')
-        );
-        
-        if (isAccessError) {
-          logger.warn(`Access denied or feed not found for ${feedConfig.name || feedConfig.playlistId}: ${error.message}`);
+        emitWorkflowWarning(feedName, error);
+
+        if (isAccessError(error)) {
+          logger.warn(`Access denied or feed not found for ${feedName}: ${error.message}`);
           logger.warn(`Skipping this feed (non-fatal error)`);
           // Don't increment error count for access issues
         } else {
-          logger.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
+          logger.error(`Error processing feed ${feedName} (after ${FEED_RETRIES} retries):`, error);
           logger.error(`Error stack:`, error.stack);
-          console.error(`Error processing feed ${feedConfig.name || feedConfig.playlistId}:`, error);
+          console.error(`Error processing feed ${feedName}:`, error);
           errorCount++;
         }
       }
@@ -302,19 +333,18 @@ async function updateAllFeeds() {
     // Save the updated feed config (with lastChecked and lastEpisodeGuid) after all feeds processed
     saveFeedsConfig();
     
-    logger.info(`Daily update complete: ${updatedCount} playlist(s) updated, ${errorCount} error(s)`);
-    
-    // If we updated at least one playlist, or if we tried to update but found no new episodes, consider it success
-    // Only fail if we had actual errors (not access denied/not found)
-    const hasPartialSuccess = updatedCount > 0;
-    const allSkipped = feedsToUpdate.length > 0 && updatedCount === 0 && errorCount === 0; // All feeds had no updates
-    
-    // Success if we updated something, or if we had no actual errors
-    const success = hasPartialSuccess || errorCount === 0;
-    
+    logger.info(`Daily update complete: ${updatedCount} playlist(s) updated, ${processedCount} feed(s) processed, ${errorCount} error(s)`);
+
+    // Transient per-feed errors don't fail the run: as long as at least one feed
+    // was processed cleanly, exit 0 (failed feeds are surfaced as workflow
+    // warnings and retried on the next scheduled run). Fail only when every
+    // feed errored.
+    const success = errorCount === 0 || processedCount > 0;
+
     return {
       success: success,
       updated: updatedCount,
+      processed: processedCount,
       errors: errorCount
     };
     
@@ -347,10 +377,13 @@ function saveFeedsConfig() {
 updateAllFeeds()
   .then(result => {
     if (result.success) {
+      if (result.errors > 0) {
+        logger.warn(`Daily update completed with ${result.errors} feed error(s) - treated as non-fatal, see workflow warnings`);
+      }
       logger.info('Daily update completed successfully');
       process.exit(0);
     } else {
-      logger.error(`Daily update completed with ${result.errors || 0} error(s)`);
+      logger.error(`Daily update failed: all feeds errored (${result.errors || 0} error(s))`);
       process.exit(1);
     }
   })
