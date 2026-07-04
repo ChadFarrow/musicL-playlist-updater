@@ -10,7 +10,7 @@
       "playlistAuthor": "ChadFarrow",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/HGH-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:15.835Z",
+      "lastChecked": "2026-07-04T09:22:41.567Z",
       "lastEpisodeGuid": "69078633-2ac3-462d-9afd-a56208a6c302",
       "checkIntervalMinutes": 1440
     },
@@ -24,7 +24,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/ITDV-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:19.197Z",
+      "lastChecked": "2026-07-04T09:22:42.699Z",
       "lastEpisodeGuid": "0bfa7433-467f-4ed8-ba08-f0b7570d6685",
       "checkIntervalMinutes": 1440
     },
@@ -38,7 +38,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/IAM-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:18.968Z",
+      "lastChecked": "2026-07-04T09:22:42.223Z",
       "lastEpisodeGuid": "933784bc-1711-4f69-a228-20370812ecaf",
       "checkIntervalMinutes": 1440
     },
@@ -52,8 +52,8 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/MMM-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:21.565Z",
-      "lastEpisodeGuid": "f5fa65c4-52ea-435e-8a02-0f8a20bc63c2",
+      "lastChecked": "2026-07-04T09:22:46.043Z",
+      "lastEpisodeGuid": "83688084-0859-4c1d-a5d7-19a8be11d472",
       "checkIntervalMinutes": 1440
     },
     {
@@ -66,7 +66,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/MMT-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:21.875Z",
+      "lastChecked": "2026-07-04T09:22:54.077Z",
       "lastEpisodeGuid": "13c170a1-e33c-4042-8285-6b3226ea3ceb",
       "checkIntervalMinutes": 1440
     },
@@ -80,7 +80,7 @@
       "playlistAuthor": "Auto musicL Maker",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/SAS-playlist-art%20.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:22.326Z",
+      "lastChecked": "2026-07-04T09:22:54.844Z",
       "lastEpisodeGuid": "9e4cf05d-4330-47e9-93cc-121b569a8db3",
       "checkIntervalMinutes": 1440
     },
@@ -94,7 +94,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/b4ts-playlist-art.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:23.092Z",
+      "lastChecked": "2026-07-04T09:22:55.980Z",
       "lastEpisodeGuid": "ecd0430f-e52d-43a6-b981-8b863b2389fc",
       "checkIntervalMinutes": 1440
     },
@@ -122,7 +122,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/UpBEATs-music-playlist.webp",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:23.543Z",
+      "lastChecked": "2026-07-04T09:22:56.315Z",
       "lastEpisodeGuid": "079ddab3-79c3-4876-bf7e-a78424de56af",
       "checkIntervalMinutes": 1440
     },
@@ -137,7 +137,7 @@
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/LT-music-playlist.png",
       "enabled": true,
       "checkIntervalMinutes": 1440,
-      "lastChecked": "2026-07-03T16:24:19.899Z",
+      "lastChecked": "2026-07-04T09:22:43.885Z",
       "lastEpisodeGuid": "d3622632-7994-4a35-a1b7-6d0360feeddf"
     },
     {
@@ -150,7 +150,7 @@
       "playlistAuthor": "ChadF",
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/TFT-playlist-art.png",
       "enabled": true,
-      "lastChecked": "2026-07-03T16:24:22.726Z",
+      "lastChecked": "2026-07-04T09:22:55.240Z",
       "lastEpisodeGuid": "51d81507-079a-4206-bc96-551285d1dea2",
       "checkIntervalMinutes": 1440
     }
