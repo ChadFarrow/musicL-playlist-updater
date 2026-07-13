@@ -28,6 +28,10 @@ npm run update-all       # Update all playlists
 npm run build            # Build playlists (build-music-playlist.js)
 npm run rebuild          # Rebuild all playlists
 
+# Community podcastL playlist aggregator (optional; runs automatically in daily CI)
+npm run create-localbitcoins-playlists            # Regenerate + publish now
+node scripts/create-localbitcoins-community-playlists.js --dry-run   # Preview XML to stdout
+
 # Daily update (used by GitHub Actions CI)
 node scripts/daily-update.js
 ```
@@ -79,7 +83,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 **Transient error tolerance**: Each feed's check/generation runs inside `withRetry` (`src/utils/retry.js`) — up to 2 retries, 10s apart. 403/404 access errors are not retried (treated as non-fatal skips). The run exits 0 as long as at least one feed processed cleanly; feeds that still fail after retries emit `::warning::` annotations on the Actions run instead of failing it. Exit 1 only when every feed errors or a fatal error occurs (unreadable config, etc.). Design doc: `docs/superpowers/specs/2026-07-03-transient-feed-error-tolerance-design.md`.
 
-**Community playlist aggregator**: After the RSS feed loop, `daily-update.js` also runs `CommunityPlaylistAggregator` (`src/services/CommunityPlaylistAggregator.js`) as one extra step under the same non-fatal policy. Unlike the RSS feeds, it is a *directory aggregator*: it pulls many shows' episodes from the `localbitcoiners.com/api/community-boosts` JSON API into a single **`podcastL`** playlist (`docs/localbitcoins-community-playlists.xml`), grow-only via merge with the existing file, with a stable hardcoded `<podcast:guid>`. It is intentionally **not** in `FEEDS.md` (the RSS discovery path expects a real source-feed RSS URL). Run standalone via `npm run create-localbitcoins-playlists` (`--dry-run` prints XML to stdout; logs go to stderr). Guide: `LOCALBITCOINERS-COMMUNITY-PLAYLIST.md`.
+**Community playlist aggregator**: After the RSS feed loop, `daily-update.js` also runs `CommunityPlaylistAggregator` (`src/services/CommunityPlaylistAggregator.js`) as one extra step under the same non-fatal policy — so the community playlist refreshes automatically with the daily CI run; no manual invocation is needed. Unlike the RSS feeds, it is a *directory aggregator*: it pulls many shows' episodes from the `localbitcoiners.com/api/community-boosts` JSON API into a single **`podcastL`** playlist (`docs/localbitcoins-community-playlists.xml`), grow-only via merge with the existing file, with a stable hardcoded `<podcast:guid>`. It is intentionally **not** in `FEEDS.md` (the RSS discovery path expects a real source-feed RSS URL). Run standalone (optional, for an off-schedule refresh) via `npm run create-localbitcoins-playlists`; `--dry-run` prints XML to stdout (winston logs go to stderr, so `--dry-run > file.xml` captures clean XML). For local publishes the CLI wrapper auto-borrows a token from an authenticated `gh` CLI when `GITHUB_TOKEN` is unset (CI always sets it from `secrets.TOKEN`). Guide: `LOCALBITCOINERS-COMMUNITY-PLAYLIST.md`.
 
 ## Configuration
 
@@ -106,7 +110,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 - Playlists output locally to `./playlists/{playlistId}.xml` (gitignored), then synced to target repo `docs/` via GitHub Contents API
 - The `playlists/` directory is a local temp workspace only — playlist XML files are NOT tracked in this repo, they live exclusively in the target repo (`chadf-musicl-playlists/docs/`)
 - Only `feeds.json` changes are git-committed in CI; playlist XML files are pushed to the separate target repo via API
-- Logs written to `./logs/combined.log` and `./logs/error.log` (Winston)
+- Logs written to `./logs/combined.log` and `./logs/error.log` (Winston); `logs/` is gitignored (both files are untracked). The Winston console transport routes **all** levels to **stderr**, leaving stdout for actual program output (e.g. `--dry-run` XML) and GitHub Actions workflow commands (`::warning::` via direct `console.log`)
 - GitHub Actions workflow (`.github/workflows/daily-feed-update.yml`) runs daily at 7 AM UTC (2 AM EST)
 - RSSMonitor normalizes both `feeds` and `rssFeeds` keys in config
 - Generated playlists use `<podcast:medium>musicL</podcast:medium>` and group tracks by episode using `<podcast:txt purpose="episode">` markers
