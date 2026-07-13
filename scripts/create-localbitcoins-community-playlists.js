@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { execFileSync } from 'child_process';
 import { CommunityPlaylistAggregator } from '../src/services/CommunityPlaylistAggregator.js';
 import { logger } from '../src/utils/logger.js';
 
@@ -55,6 +56,21 @@ const dryRun = Boolean(ARGS['dry-run'] || process.env.LBC_DRY_RUN);
 // In dry-run there is nothing to push, so don't require/attempt GitHub access.
 if (dryRun) {
   fullConfig.enableGitHubSync = false;
+}
+
+// Local convenience: if no token was provided (env/config) but the GitHub CLI
+// is authenticated, borrow its token so `npm run create-localbitcoins-playlists`
+// just works locally. CI always sets GITHUB_TOKEN, so this never runs there.
+if (!dryRun && fullConfig.enableGitHubSync && !fullConfig.githubToken) {
+  try {
+    const ghToken = execFileSync('gh', ['auth', 'token'], { encoding: 'utf8' }).trim();
+    if (ghToken) {
+      fullConfig.githubToken = ghToken;
+      logger.info('No GITHUB_TOKEN set; using token from authenticated gh CLI');
+    }
+  } catch {
+    logger.warn('No GITHUB_TOKEN set and gh CLI unavailable/unauthenticated; will write local file only');
+  }
 }
 
 const opts = {
