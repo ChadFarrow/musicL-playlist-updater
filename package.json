@@ -19,6 +19,7 @@
     "status": "node update-cli.js status",
     "build": "node build-music-playlist.js",
     "rebuild": "node build-music-playlist.js rebuild",
+    "create-localbitcoins-playlists": "node scripts/create-localbitcoins-community-playlists.js",
     "test-podping": "node scripts/test-podping.js"
   },
   "keywords": [

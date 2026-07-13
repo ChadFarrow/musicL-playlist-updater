@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { RSSPlaylistGenerator } from '../src/services/RSSPlaylistGenerator.js';
+import { CommunityPlaylistAggregator } from '../src/services/CommunityPlaylistAggregator.js';
 import { GitHubSync } from '../src/services/GitHubSync.js';
 import { logger } from '../src/utils/logger.js';
 import { withRetry } from '../src/utils/retry.js';
@@ -306,6 +307,36 @@ async function updateAllFeeds() {
       }
     }
     
+    // Aggregate the LocalBitcoiners community podcastL playlist. This is NOT a
+    // single RSS feed (it reads a JSON directory API), so it runs as its own
+    // step here rather than via FEEDS.md discovery. Same non-fatal policy as
+    // the feeds above: transient errors are retried, 403/404 are skipped, and a
+    // failure surfaces a workflow warning instead of failing the run.
+    try {
+      logger.info('Generating LocalBitcoiners community playlist');
+      const aggregator = new CommunityPlaylistAggregator(fullConfig);
+      const communityResult = await withRetry(() => aggregator.generate(), {
+        retries: FEED_RETRIES,
+        delayMs: FEED_RETRY_DELAY_MS,
+        shouldRetry: (error) => !isAccessError(error),
+        onRetry: (error, attempt) => {
+          logger.warn(`Retry ${attempt}/${FEED_RETRIES} for community playlist after error: ${error.message}`);
+        }
+      });
+      logger.info(`Community playlist updated: ${communityResult.episodeCount} episode(s) (${communityResult.newCount} new)`);
+      updatedCount++;
+      processedCount++;
+    } catch (error) {
+      emitWorkflowWarning('community-playlist', error);
+      if (isAccessError(error)) {
+        logger.warn(`Access denied or not found for community playlist: ${error.message}`);
+        logger.warn('Skipping community playlist (non-fatal error)');
+      } else {
+        logger.error(`Error generating community playlist (after ${FEED_RETRIES} retries):`, error);
+        errorCount++;
+      }
+    }
+
     // Update feeds.json with feeds from FEEDS.md if we used them
     if (feedsFromMd.length > 0) {
       // Merge with existing configured feeds, updating existing ones and adding new ones
