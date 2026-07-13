@@ -18,8 +18,11 @@ export const logger = winston.createLogger({
   ),
   defaultMeta: { service: 'musicl-playlist-updater' },
   transports: [
-    // Write all logs to console
+    // Write all logs to console. Route every level to stderr so stdout stays
+    // reserved for program output (e.g. the community-playlist --dry-run XML)
+    // and GitHub Actions workflow commands emitted via direct console.log.
     new winston.transports.Console({
+      stderrLevels: ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'],
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()

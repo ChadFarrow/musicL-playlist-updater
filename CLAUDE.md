@@ -79,6 +79,8 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 **Transient error tolerance**: Each feed's check/generation runs inside `withRetry` (`src/utils/retry.js`) — up to 2 retries, 10s apart. 403/404 access errors are not retried (treated as non-fatal skips). The run exits 0 as long as at least one feed processed cleanly; feeds that still fail after retries emit `::warning::` annotations on the Actions run instead of failing it. Exit 1 only when every feed errors or a fatal error occurs (unreadable config, etc.). Design doc: `docs/superpowers/specs/2026-07-03-transient-feed-error-tolerance-design.md`.
 
+**Community playlist aggregator**: After the RSS feed loop, `daily-update.js` also runs `CommunityPlaylistAggregator` (`src/services/CommunityPlaylistAggregator.js`) as one extra step under the same non-fatal policy. Unlike the RSS feeds, it is a *directory aggregator*: it pulls many shows' episodes from the `localbitcoiners.com/api/community-boosts` JSON API into a single **`podcastL`** playlist (`docs/localbitcoins-community-playlists.xml`), grow-only via merge with the existing file, with a stable hardcoded `<podcast:guid>`. It is intentionally **not** in `FEEDS.md` (the RSS discovery path expects a real source-feed RSS URL). Run standalone via `npm run create-localbitcoins-playlists` (`--dry-run` prints XML to stdout; logs go to stderr). Guide: `LOCALBITCOINERS-COMMUNITY-PLAYLIST.md`.
+
 ## Configuration
 
 **Feed Config**: `src/config/feeds.json`
