@@ -32,9 +32,10 @@ const PLAYLIST_DESCRIPTION =
 // <podcast:guid> every time it is regenerated, so this is hardcoded.
 const PLAYLIST_GUID = '5da03898-d837-435d-9474-4be9a6c95e13';
 const PLAYLIST_ID = 'smallgroup-shows-playlist';
-// Cover art: upload an image to the target repo's docs/ and put its
-// raw.githubusercontent.com URL here; left empty, no <image> is written.
-const PLAYLIST_IMAGE_URL = '';
+// Cover art: docs/smallgroup-shows-playlist-art.png in the target repo, by its
+// raw.githubusercontent.com URL. Set to '' and no <image> is written.
+const PLAYLIST_IMAGE_URL =
+  'https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/smallgroup-shows-playlist-art.png';
 // Run state the XML can't carry (episode dates, each show's feed). Kept out of
 // docs/ so it is never served or discovered as a playlist.
 const STATE_PATH = `state/${PLAYLIST_ID}.json`;
