@@ -36,8 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           FORCE_UPDATE: ${{ inputs.force_update || 'false' }}
-          HIVE_USERNAME: ${{ secrets.HIVE_USERNAME }}
-          HIVE_POSTING_KEY: ${{ secrets.HIVE_POSTING_KEY }}
+          PODPING_ENDPOINT_URL: ${{ secrets.PODPING_ENDPOINT_URL }}
+          PODPING_BEARER_TOKEN: ${{ secrets.PODPING_BEARER_TOKEN }}
         run: node scripts/daily-update.js
         
       - name: Commit and push changes

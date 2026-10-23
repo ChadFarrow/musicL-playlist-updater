@@ -12,8 +12,10 @@ https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/sm
 ```
 
 Add this URL to a podcast app. It's also served by GitHub Pages at
-`https://chadfarrow.github.io/chadf-musicl-playlists/smallgroup-shows-playlist.xml`, but
-PodPings only name the raw URL above.
+`https://chadfarrow.github.io/chadf-musicl-playlists/smallgroup-shows-playlist.xml`.
+No PodPing is sent for this playlist (`SEND_PODPING = false` in the aggregator) while it is
+kept out of Podcast Index: a PodPing reader may add a feed it does not know. Once it is in
+PI, set `SEND_PODPING` to true; the PodPing names the raw URL above, with `medium=podcastL`.
 
 | | |
 | --- | --- |
@@ -50,7 +52,7 @@ It is built to stay up while the site is being built:
 - **The shows page fails, or lists under half the last known shows:** the last known
   show list is used instead.
 - **Nothing changed:** when the new XML matches the published file apart from its
-  `<pubDate>`/`<lastBuildDate>`, nothing is pushed or PodPinged. A change to the channel
+  `<pubDate>`/`<lastBuildDate>`, nothing is pushed. A change to the channel
   (new artwork, a removed tag) is pushed on the next run, even with no new episode.
 
 ## Usage

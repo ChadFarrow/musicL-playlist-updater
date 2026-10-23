@@ -18,6 +18,17 @@ export function stablePlaylistGuid(configuredGuid, publishedXml, mint) {
   return configuredGuid || (publishedXml ? extractChannelGuid(publishedXml) : null) || mint();
 }
 
+/**
+ * The playlist URL a PodPing names. Readers match a PodPing to a feed by URL,
+ * so this is the refs/heads/<branch> form that Podcast Index and
+ * chadf-musicl-publisher.xml list every playlist under — not the .../main/
+ * form this repo pushes to, which a reader may not know, or may add as a
+ * second copy of the feed.
+ */
+export function podpingFeedUrl(config, playlistId) {
+  return `https://raw.githubusercontent.com/${config.githubRepoOwner}/${config.githubRepoName}/refs/heads/${config.githubRepoBranch || 'main'}/docs/${playlistId}.xml`;
+}
+
 export class RSSPlaylistGenerator {
   constructor(config) {
     this.config = config;
@@ -385,10 +396,9 @@ export class RSSPlaylistGenerator {
               try {
                 await this.initializePodPing();
                 if (this.podping) {
-                  // Construct playlist feed URL: https://raw.githubusercontent.com/{owner}/{repo}/{branch}/docs/{playlistId}.xml
-                  const playlistFeedUrl = `https://raw.githubusercontent.com/${this.config.githubRepoOwner}/${this.config.githubRepoName}/${this.config.githubRepoBranch || 'main'}/docs/${feedConfig.playlistId}.xml`;
+                  const playlistFeedUrl = podpingFeedUrl(this.config, feedConfig.playlistId);
                   logger.info(`Sending PodPing notification for playlist feed: ${playlistFeedUrl}`);
-                  const podpingResult = await this.podping.sendNotification(playlistFeedUrl);
+                  const podpingResult = await this.podping.sendNotification(playlistFeedUrl, { medium: 'musicL' });
                   if (podpingResult.success) {
                     logger.info(`PodPing notification sent for ${feedConfig.name} playlist`);
                   } else {

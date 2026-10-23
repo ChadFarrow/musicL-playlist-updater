@@ -21,9 +21,8 @@
   "podping": {
     "enabled": true,
     "timeout": 10000,
-    "hiveNode": "https://api.hive.blog",
-    "hiveUsername": "",
-    "hivePostingKey": ""
+    "endpointUrl": "",
+    "bearerToken": ""
   },
   "productionMode": true
 }

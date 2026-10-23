@@ -340,6 +340,22 @@ test('generate publishes every show\'s episodes newest-first, plus the run state
   assert.match(readFileSync(result.path, 'utf8'), /itemGuid="bab-2"/);
 });
 
+test('generate sends no PodPing while the playlist is kept out of Podcast Index', async () => {
+  const repo = fakeRepo();
+  const agg = new SmallGroupPlaylistAggregator(
+    { playlistsDir: mkdtempSync(join(tmpdir(), 'smallgroup-test-')), enableGitHubSync: true, podping: { enabled: true } },
+    { fetchText: fakeWeb(TWO_SHOWS).fetchText, githubSync: repo, retryDelayMs: 0 }
+  );
+  let pinged = 0;
+  agg.sendPodping = async () => {
+    pinged += 1;
+  };
+  const result = await agg.generate();
+  assert.equal(result.changed, true);
+  assert.ok(repo.commits.some((c) => c.path === PLAYLIST_PATH), 'the playlist was pushed');
+  assert.equal(pinged, 0);
+});
+
 test('generate keeps a show\'s previous episodes, in date order, when its feed is down', async () => {
   const repo = fakeRepo();
   await aggregator(fakeWeb(TWO_SHOWS), repo).generate();

@@ -3,10 +3,11 @@
  * /hub/pubnotify endpoint, so PI re-crawls the feed instead of waiting for its
  * own poll.
  *
- * This replaces PodPing as the way PI hears about a push: PI never acted on the
- * PodPings this repo sends (custom_json id `podping` with `reasons`/`urls`, not
- * the `pp_<medium>_<reason>` / `iris` format readers expect) and had not
- * crawled the playlists since 2025-09. PodPing is still sent for other readers.
+ * Before 2026-10-23 PI never acted on this repo's PodPings (custom_json id
+ * `podping` with `reasons`/`urls`, not the `pp_<medium>_<reason>` / `iris`
+ * format readers expect) and had not crawled the playlists since 2025-09.
+ * PodPings now go out in the right format (PodPing.js), but this call names
+ * the feed by ID and reaches PI even when a PodPing does not.
  *
  * The call names the feed by its Podcast Index ID, never by URL: PI holds these
  * feeds under `.../refs/heads/main/docs/<id>.xml` while this repo publishes
