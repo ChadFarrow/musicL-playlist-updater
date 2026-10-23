@@ -81,10 +81,11 @@ Problems show up as annotations on the Actions run:
   it to `KNOWN_FEEDS`.
 - `Small Group playlist` (warning): for example, the shows page couldn't be read.
 
-`FEEDS.md` lists it in its podcastL section, for reference. The per-feed RSS loop skips
-it all the same: `discoverPlaylists()` only takes a playlist that carries a
-`<podcast:txt purpose="source-feed">`, and this one writes none. Do not add one — it would
-name the shows web page, which that loop would then try to parse as RSS.
+`FEEDS.md` lists it in its podcastL section, for reference. The per-feed RSS loop never
+takes it: `parseFeedsMarkdown` keeps only IDs that contain `-music-playlist`,
+`-muic-playlist` or `-musicl-`. The playlist writes no `<podcast:txt purpose="source-feed">`.
+Do not add one — it would name the shows web page, which boostmebitch downloads as the
+show the playlist was built from.
 
 ## Artwork
 

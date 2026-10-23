@@ -211,6 +211,9 @@ export class CommunityPlaylistAggregator {
     };
   }
 
+  // No <podcast:txt purpose="source-feed">: the community-boosts API is not a
+  // feed. boostmebitch downloads that tag's URL as the show a playlist was
+  // built from, which here meant 4.3 MB of JSON on every page it built.
   buildPlaylistXml(remoteItems) {
     const pubDate = new Date().toUTCString();
     // Escape guid attribute values: some come from the API as permalink URLs
@@ -227,7 +230,6 @@ export class CommunityPlaylistAggregator {
     <title>${escapeXml(PLAYLIST_TITLE)}</title>
     <description>${escapeXml(PLAYLIST_DESCRIPTION)}</description>
     <link>${escapeXml(PLAYLIST_LINK)}</link>
-    <podcast:txt purpose="source-feed">${escapeXml(this.apiUrl)}</podcast:txt>
     <language>en</language>
     <pubDate>${pubDate}</pubDate>
     <lastBuildDate>${pubDate}</lastBuildDate>

@@ -489,9 +489,9 @@ export function mergeEpisodes(episodesBySlug, showOrder) {
  * written for shows that aren't plain podcasts (e.g. a video feed).
  *
  * No `<podcast:txt purpose="source-feed">`: thirteen shows have no single
- * source feed, and the tag would name a web page. Two readers take it as an
- * RSS URL — the daily RSS loop (via FEEDS.md) tries to rebuild the playlist
- * from it, and boostmebitch downloads it as the show the list was built from.
+ * source feed, and the tag would name a web page, which boostmebitch downloads
+ * as the show the list was built from. (The daily RSS loop never takes this
+ * playlist either way: `parseFeedsMarkdown` keeps only musicL playlist IDs.)
  */
 export function buildPlaylistXml(episodes, { imageUrl = '', pubDate = new Date().toUTCString() } = {}) {
   const lines = episodes.map((episode) => {

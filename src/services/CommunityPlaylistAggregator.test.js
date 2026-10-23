@@ -90,3 +90,27 @@ test('a published file that cannot be read is not "unchanged": the run still pus
   assert.equal(result.changed, true);
   assert.equal(repo.commits.length, 1);
 });
+
+test('the playlist names no source-feed: the API is not a feed', async () => {
+  const repo = fakeRepo();
+  await aggregator(BOOSTS, repo).generate();
+  const xml = repo.contents.get(PLAYLIST_PATH);
+  assert.doesNotMatch(xml, /source-feed/);
+  assert.doesNotMatch(xml, /community-boosts/);
+  assert.match(xml, /<podcast:medium>podcastL<\/podcast:medium>/);
+});
+
+test('a published file that still names the API as source-feed is a change, so it is pushed once', async () => {
+  const repo = fakeRepo();
+  await aggregator(BOOSTS, repo).generate();
+  // The header as published before the tag was removed (2026-10-23).
+  const old = repo.contents.get(PLAYLIST_PATH).replace(
+    '    <language>en</language>',
+    '    <podcast:txt purpose="source-feed">https://localbitcoiners.com/api/community-boosts</podcast:txt>\n    <language>en</language>'
+  );
+  repo.contents.set(PLAYLIST_PATH, old);
+  const result = await aggregator(BOOSTS, repo).generate();
+  assert.equal(result.changed, true);
+  assert.equal(repo.commits.length, 2);
+  assert.doesNotMatch(repo.contents.get(PLAYLIST_PATH), /source-feed/);
+});
