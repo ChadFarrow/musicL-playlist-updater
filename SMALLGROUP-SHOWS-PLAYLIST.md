@@ -49,7 +49,9 @@ It is built to stay up while the site is being built:
 - **A show's feed is down:** its previous episodes stay in the playlist (from the run state).
 - **The shows page fails, or lists under half the last known shows:** the last known
   show list is used instead.
-- **No new episodes:** nothing is pushed or PodPinged.
+- **Nothing changed:** when the new XML matches the published file apart from its
+  `<pubDate>`/`<lastBuildDate>`, nothing is pushed or PodPinged. A change to the channel
+  (new artwork, a removed tag) is pushed on the next run, even with no new episode.
 
 ## Usage
 
@@ -77,12 +79,15 @@ Problems show up as annotations on the Actions run:
   it to `KNOWN_FEEDS`.
 - `Small Group playlist` (warning): for example, the shows page couldn't be read.
 
-It is intentionally **not** listed in `FEEDS.md`, which drives the per-feed musicL
-playlists.
+`FEEDS.md` lists it in its podcastL section, for reference. The per-feed RSS loop skips
+it all the same: `discoverPlaylists()` only takes a playlist that carries a
+`<podcast:txt purpose="source-feed">`, and this one writes none. Do not add one — it would
+name the shows web page, which that loop would then try to parse as RSS.
 
 ## Artwork
 
 Upload an image to `docs/` in `chadf-musicl-playlists`, then set `PLAYLIST_IMAGE_URL` in
 `src/services/SmallGroupPlaylistAggregator.js` to its raw.githubusercontent.com URL.
+The next run publishes it, even on a day with no new episode.
 
 Design: `docs/superpowers/specs/2026-10-23-smallgroup-shows-playlist-design.md`.

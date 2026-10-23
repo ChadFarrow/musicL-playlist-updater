@@ -14,7 +14,7 @@ import {
   parseFeedEpisodes,
   feedGuidFromUrl,
   mergeEpisodes,
-  episodesEqual,
+  sameApartFromBuildDates,
   buildPlaylistXml
 } from './SmallGroupPlaylistAggregator.js';
 
@@ -208,14 +208,17 @@ test('mergeEpisodes drops shows that are no longer in the show order', () => {
   assert.deepEqual(mergeEpisodes(bySlug, ['bab']).map((e) => e.itemGuid), ['bab-1']);
 });
 
-test('episodesEqual compares exactly what the playlist XML would contain', () => {
+test('sameApartFromBuildDates ignores only the two build dates', () => {
   const a = [episode('bab', 'bab-1', '2026-10-01T00:00:00.000Z')];
-  assert.equal(episodesEqual(a, [episode('bab', 'bab-1', '2026-10-02T00:00:00.000Z')]), true, 'dates are not in the XML');
-  assert.equal(episodesEqual(a, [episode('bab', 'bab-2', '2026-10-01T00:00:00.000Z')]), false);
-  assert.equal(episodesEqual(a, [{ ...a[0], feedUrl: 'https://moved.example/feed.xml' }]), false);
-  assert.equal(episodesEqual(a, [{ ...a[0], medium: 'video' }]), false);
-  assert.equal(episodesEqual(a, [...a, ...a]), false);
-  assert.equal(episodesEqual(a, undefined), false);
+  const build = (items, opts = {}) => buildPlaylistXml(items, { pubDate: 'Thu, 22 Oct 2026 12:00:00 GMT', ...opts });
+  const same = sameApartFromBuildDates;
+  assert.equal(same(build(a), build(a, { pubDate: 'Fri, 23 Oct 2026 12:00:00 GMT' })), true, 'a new run date is not a change');
+  assert.equal(same(build(a), build([episode('bab', 'bab-1', '2026-10-02T00:00:00.000Z')])), true, 'episode dates are not in the XML');
+  assert.equal(same(build(a), build([episode('bab', 'bab-2', '2026-10-01T00:00:00.000Z')])), false);
+  assert.equal(same(build(a), build([{ ...a[0], feedUrl: 'https://moved.example/feed.xml' }])), false);
+  assert.equal(same(build(a), build([{ ...a[0], medium: 'video' }])), false);
+  assert.equal(same(build(a), build([...a, ...a])), false);
+  assert.equal(same(build(a), build(a, { imageUrl: 'https://x.example/art.webp' })), false, 'new cover art is a change');
 });
 
 test('buildPlaylistXml writes one escaped podcastL remoteItem per episode, in order', () => {
@@ -226,7 +229,8 @@ test('buildPlaylistXml writes one escaped podcastL remoteItem per episode, in or
   ]);
   assert.match(xml, /<podcast:medium>podcastL<\/podcast:medium>/);
   assert.match(xml, /<podcast:guid>[0-9a-f-]{36}<\/podcast:guid>/);
-  assert.match(xml, /<podcast:txt purpose="source-feed">https:\/\/smallgroupscoop\.com\/shows\/<\/podcast:txt>/);
+  // A web page is not a source feed; the daily RSS loop would try to parse it.
+  assert.doesNotMatch(xml, /purpose="source-feed"/);
   assert.deepEqual(xml.split('\n').filter((line) => line.includes('remoteItem')), [
     '    <podcast:remoteItem feedGuid="bab-guid" feedUrl="https://bab.example/feed.xml" itemGuid="https://bab.example/?p=1&amp;x=2"/>',
     '    <podcast:remoteItem feedGuid="hso-guid" feedUrl="https://hso.example/feed.xml" itemGuid="hso-1" medium="video"/>',
@@ -384,6 +388,23 @@ test('generate does not republish when no show has a new episode', async () => {
 
   assert.equal(result.changed, false);
   assert.equal(repo.commits.length, commitsAfterFirstRun);
+});
+
+test('generate republishes a playlist whose channel changed, with no new episode', async () => {
+  const repo = fakeRepo();
+  await aggregator(fakeWeb(TWO_SHOWS), repo).generate();
+  // Yesterday's file, as an older build wrote it: same episodes, one more tag.
+  const old = repo.contents.get(PLAYLIST_PATH).replace(
+    '<language>en</language>',
+    '<podcast:txt purpose="source-feed">https://smallgroupscoop.com/shows/</podcast:txt>\n    <language>en</language>'
+  );
+  repo.contents.set(PLAYLIST_PATH, old);
+
+  const result = await aggregator(fakeWeb(TWO_SHOWS), repo).generate();
+
+  assert.equal(result.changed, true);
+  assert.doesNotMatch(repo.contents.get(PLAYLIST_PATH), /source-feed/);
+  assert.deepEqual(remoteItemGuids(repo.contents.get(PLAYLIST_PATH)), ['bab-2', 'hgh-1', 'bab-1']);
 });
 
 test('generate drops a show that leaves the shows page', async () => {

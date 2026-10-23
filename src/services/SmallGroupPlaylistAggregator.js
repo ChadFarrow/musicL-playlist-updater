@@ -168,7 +168,11 @@ export class SmallGroupPlaylistAggregator {
       return { success: true, changed: true, dryRun: true, path: null, ...summary };
     }
 
-    if (episodesEqual(episodes, state.episodes)) {
+    // Compared with the PUBLISHED file, not the saved episode list: a change to
+    // the channel (cover art, a removed tag) must reach the feed even on a day
+    // no show releases an episode.
+    const published = this.githubSync ? await this.githubSync.getFileContent(this.githubPath) : null;
+    if (published !== null && sameApartFromBuildDates(published, xml)) {
       logger.info('No new Small Group episodes — playlist unchanged');
       return { success: true, changed: false, path: null, githubPath: this.githubPath, ...summary };
     }
@@ -475,21 +479,24 @@ export function mergeEpisodes(episodesBySlug, showOrder) {
     .sort((a, b) => sortTime(b) - sortTime(a));
 }
 
-/** True when two episode lists would produce the same playlist entries. */
-export function episodesEqual(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
-  return a.every((episode, i) =>
-    episode.feedGuid === b[i].feedGuid &&
-    episode.feedUrl === b[i].feedUrl &&
-    episode.itemGuid === b[i].itemGuid &&
-    xmlMedium(episode) === xmlMedium(b[i])
-  );
+/**
+ * True when two builds of the playlist differ only in <pubDate> and
+ * <lastBuildDate>, which change on every run.
+ */
+export function sameApartFromBuildDates(a, b) {
+  const strip = (xml) => String(xml).replace(/<(pubDate|lastBuildDate)>[^<]*<\/\1>/g, '');
+  return strip(a) === strip(b);
 }
 
 /**
  * The playlist feed: same channel shape as CommunityPlaylistAggregator, a flat
  * podcastL list of remoteItems (no musicL episode markers). `medium` is only
  * written for shows that aren't plain podcasts (e.g. a video feed).
+ *
+ * No `<podcast:txt purpose="source-feed">`: thirteen shows have no single
+ * source feed, and the tag would name a web page. Two readers take it as an
+ * RSS URL — the daily RSS loop (via FEEDS.md) tries to rebuild the playlist
+ * from it, and boostmebitch downloads it as the show the list was built from.
  */
 export function buildPlaylistXml(episodes, { imageUrl = '', pubDate = new Date().toUTCString() } = {}) {
   const lines = episodes.map((episode) => {
@@ -509,7 +516,6 @@ export function buildPlaylistXml(episodes, { imageUrl = '', pubDate = new Date()
     <title>${escapeXml(PLAYLIST_TITLE)}</title>
     <description>${escapeXml(PLAYLIST_DESCRIPTION)}</description>
     <link>${escapeXml(SHOWS_URL)}</link>
-    <podcast:txt purpose="source-feed">${escapeXml(SHOWS_URL)}</podcast:txt>
     <language>en</language>
     <pubDate>${pubDate}</pubDate>
     <lastBuildDate>${pubDate}</lastBuildDate>${image}
