@@ -3,6 +3,19 @@ import axios from 'axios';
 import { logger } from '../utils/logger.js';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { extractChannelGuid } from './SmallGroupPlaylistAggregator.js';
+
+/**
+ * The <podcast:guid> a musicL playlist is published under. It is the feed's
+ * identity — Podcast Index, favorites and boostagrams key on it — so it must be
+ * the same on every run: the one configured in feeds.json (`playlistGuid`),
+ * else the one already published, and a new one only for a playlist that has
+ * neither. Minting one per build gave every playlist a new identity on each
+ * update.
+ */
+export function stablePlaylistGuid(configuredGuid, publishedXml, mint) {
+  return configuredGuid || (publishedXml ? extractChannelGuid(publishedXml) : null) || mint();
+}
 
 export class RSSPlaylistGenerator {
   constructor(config) {
@@ -101,6 +114,10 @@ export class RSSPlaylistGenerator {
           logger.debug(`Could not check existing playlist: ${error.message}`);
         }
       }
+
+      // Kept on feedConfig, which daily-update saves to feeds.json, so the next
+      // run reuses it even if the published file can't be read.
+      feedConfig.playlistGuid = stablePlaylistGuid(feedConfig.playlistGuid, existingContent, () => this.generateGUID());
 
       // Extract feedGuid/itemGuid pairs from RSS feed (like Auto-musicL-Maker does)
       // Auto-musicL-Maker extracts all pairs from valueTimeSplit tags in RSS feed order
