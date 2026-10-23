@@ -14,9 +14,9 @@ import {
   parseFeedEpisodes,
   feedGuidFromUrl,
   mergeEpisodes,
-  sameApartFromBuildDates,
   buildPlaylistXml
 } from './SmallGroupPlaylistAggregator.js';
+import { sameApartFromBuildDates } from '../utils/xml.js';
 
 // Trimmed copy of the real https://smallgroupscoop.com/shows/ markup: each show
 // is linked from the nav, a hidden card link, and the card heading.

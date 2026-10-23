@@ -20,7 +20,7 @@ import { join } from 'path';
 import Parser from 'rss-parser';
 import { logger } from '../utils/logger.js';
 import { withRetry, isAccessError } from '../utils/retry.js';
-import { escapeXml } from '../utils/xml.js';
+import { escapeXml, sameApartFromBuildDates } from '../utils/xml.js';
 
 const SHOWS_URL = 'https://smallgroupscoop.com/shows/';
 const EPISODES_PER_SHOW = 10;
@@ -481,15 +481,6 @@ export function mergeEpisodes(episodesBySlug, showOrder) {
   return showOrder
     .flatMap((slug) => episodesBySlug.get(slug) || [])
     .sort((a, b) => sortTime(b) - sortTime(a));
-}
-
-/**
- * True when two builds of the playlist differ only in <pubDate> and
- * <lastBuildDate>, which change on every run.
- */
-export function sameApartFromBuildDates(a, b) {
-  const strip = (xml) => String(xml).replace(/<(pubDate|lastBuildDate)>[^<]*<\/\1>/g, '');
-  return strip(a) === strip(b);
 }
 
 /**

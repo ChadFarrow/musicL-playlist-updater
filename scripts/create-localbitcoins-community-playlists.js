@@ -89,7 +89,7 @@ aggregator
   .generate()
   .then((result) => {
     if (!result.dryRun) {
-      logger.info(`Community playlist complete: ${result.episodeCount} episode(s) (${result.newCount} new)`);
+      logger.info(`Community playlist ${result.changed ? 'pushed' : 'unchanged, not pushed'}: ${result.episodeCount} episode(s) (${result.newCount} from latest snapshot)`);
     }
     process.exit(0);
   })

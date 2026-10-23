@@ -3,7 +3,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { logger } from '../utils/logger.js';
 import { withRetry } from '../utils/retry.js';
-import { escapeXml, extractRemoteItems } from '../utils/xml.js';
+import { escapeXml, extractRemoteItems, sameApartFromBuildDates } from '../utils/xml.js';
 
 /**
  * Aggregate the podcast episodes surfaced at localbitcoiners.com/feeds into ONE
@@ -53,6 +53,7 @@ export class CommunityPlaylistAggregator {
    * @param {string} [opts.apiUrl]     - override the community-boosts API URL
    * @param {string} [opts.outputPath] - override the local output path
    * @param {boolean} [opts.dryRun]    - print XML instead of writing/pushing
+   * @param {Function} [opts.get]      - axios.get, injectable for tests
    */
   constructor(config = {}, opts = {}) {
     this.config = config;
@@ -64,6 +65,7 @@ export class CommunityPlaylistAggregator {
       join(config.playlistsDir || './playlists', `${this.playlistId}.xml`);
     this.dryRun = Boolean(opts.dryRun);
     this.githubSync = null;
+    this.get = opts.get || axios.get;
   }
 
   async initializeGitHubSync() {
@@ -84,7 +86,7 @@ export class CommunityPlaylistAggregator {
     // 1. Fetch the community-boosts snapshot (transient failures retried).
     const boosts = await withRetry(
       async () => {
-        const response = await axios.get(this.apiUrl, {
+        const response = await this.get(this.apiUrl, {
           headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
           timeout: FETCH_TIMEOUT_MS
         });
@@ -127,13 +129,14 @@ export class CommunityPlaylistAggregator {
     // 3. Merge with the existing published playlist so the rolling snapshot
     //    never shrinks the playlist (grow-only, like RSSPlaylistGenerator).
     let preserved = 0;
+    let published = null;
     if (this.config.enableGitHubSync) {
       try {
         await this.initializeGitHubSync();
         if (this.githubSync) {
-          const existing = await this.githubSync.getFileContent(this.githubPath);
-          if (existing) {
-            for (const item of extractRemoteItems(existing)) {
+          published = await this.githubSync.getFileContent(this.githubPath);
+          if (published) {
+            for (const item of extractRemoteItems(published)) {
               const key = `${item.feedGuid}::${item.itemGuid}`;
               if (seen.has(key)) continue;
               seen.add(key);
@@ -162,12 +165,27 @@ export class CommunityPlaylistAggregator {
       return { success: true, episodeCount: fresh.length, newCount: fresh.length - preserved, path: null, dryRun: true };
     }
 
-    // 6. Write local copy.
+    // 6. Unchanged apart from the two build dates: push nothing. Pushing anyway
+    //    made a commit on every run that only moved the dates. A published file
+    //    that could not be read (null) is not "unchanged", so it still pushes.
+    if (published && sameApartFromBuildDates(published, xml)) {
+      logger.info(`No change in ${PLAYLIST_TITLE} (${fresh.length} episodes) — not pushed`);
+      return {
+        success: true,
+        changed: false,
+        episodeCount: fresh.length,
+        newCount: fresh.length - preserved,
+        path: null,
+        githubPath: this.githubPath
+      };
+    }
+
+    // 7. Write local copy.
     this.ensureDirectoryExists(this.config.playlistsDir || './playlists');
     writeFileSync(this.outputPath, xml, 'utf8');
     logger.info(`Wrote local playlist: ${this.outputPath} (${fresh.length} episodes)`);
 
-    // 7. Sync to the target repo.
+    // 8. Sync to the target repo.
     if (this.config.enableGitHubSync) {
       await this.initializeGitHubSync();
       if (this.githubSync) {
@@ -185,6 +203,7 @@ export class CommunityPlaylistAggregator {
 
     return {
       success: true,
+      changed: true,
       episodeCount: fresh.length,
       newCount: fresh.length - preserved,
       path: this.outputPath,
