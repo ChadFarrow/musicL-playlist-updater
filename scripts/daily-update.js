@@ -4,6 +4,7 @@ import { RSSPlaylistGenerator } from '../src/services/RSSPlaylistGenerator.js';
 import { CommunityPlaylistAggregator } from '../src/services/CommunityPlaylistAggregator.js';
 import { SmallGroupPlaylistAggregator } from '../src/services/SmallGroupPlaylistAggregator.js';
 import { GitHubSync } from '../src/services/GitHubSync.js';
+import { podpingConfigFrom } from '../src/services/PodPing.js';
 import { logger } from '../src/utils/logger.js';
 import { withRetry, isAccessError } from '../src/utils/retry.js';
 
@@ -79,14 +80,8 @@ const fullConfig = {
   githubRepoBranch: config.github?.repoBranch || 'main',
   enableGitHubSync: config.github?.enableSync !== false,
   
-  // PodPing settings - check environment variables first, then config
-  podping: {
-    enabled: config.podping?.enabled !== false,
-    timeout: config.podping?.timeout || 10000,
-    hiveNode: config.podping?.hiveNode || 'https://api.hive.blog',
-    hiveUsername: process.env.HIVE_USERNAME || config.podping?.hiveUsername || '',
-    hivePostingKey: process.env.HIVE_POSTING_KEY || config.podping?.hivePostingKey || ''
-  },
+  // PodPing pusher (msp-podping-service) - environment variables first, then config
+  podping: podpingConfigFrom(config),
   
   // Logging
   logLevel: config.logging?.level || 'info'

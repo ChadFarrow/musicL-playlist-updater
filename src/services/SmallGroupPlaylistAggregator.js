@@ -32,6 +32,9 @@ const PLAYLIST_DESCRIPTION =
 // <podcast:guid> every time it is regenerated, so this is hardcoded.
 const PLAYLIST_GUID = '5da03898-d837-435d-9474-4be9a6c95e13';
 const PLAYLIST_ID = 'smallgroup-shows-playlist';
+// No PodPing for this playlist yet: it is not in Podcast Index, on purpose, and
+// a PodPing reader may add a feed it does not know. Set to true once it is in PI.
+const SEND_PODPING = false;
 // Cover art: docs/smallgroup-shows-playlist-art.png in the target repo, by its
 // raw.githubusercontent.com URL. Set to '' and no <image> is written.
 const PLAYLIST_IMAGE_URL =
@@ -189,7 +192,7 @@ export class SmallGroupPlaylistAggregator {
         const nextState = { updatedAt: new Date().toISOString(), shows: nextShows, episodes };
         await this.githubSync.updateFile(STATE_PATH, `${JSON.stringify(nextState, null, 2)}\n`, message);
         logger.info(`Synced playlist to GitHub: ${this.githubPath}`);
-        await this.sendPodping();
+        if (SEND_PODPING) await this.sendPodping();
       } else {
         logger.warn('GitHub sync enabled but no token available; wrote local file only');
       }
@@ -311,7 +314,7 @@ export class SmallGroupPlaylistAggregator {
     try {
       const { PodPing } = await import('./PodPing.js');
       const playlistFeedUrl = `https://raw.githubusercontent.com/${this.config.githubRepoOwner}/${this.config.githubRepoName}/${this.config.githubRepoBranch || 'main'}/${this.githubPath}`;
-      const result = await new PodPing(this.config.podping).sendNotification(playlistFeedUrl);
+      const result = await new PodPing(this.config.podping).sendNotification(playlistFeedUrl, { medium: 'podcastL' });
       if (result.success) {
         logger.info(`PodPing notification sent for ${playlistFeedUrl}`);
       } else {

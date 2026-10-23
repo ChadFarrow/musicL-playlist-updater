@@ -1,129 +1,106 @@
-import { Client, PrivateKey } from '@hiveio/dhive';
+/**
+ * Sends PodPings through the msp-podping-service pusher
+ * (https://github.com/ChadFarrow/msp-podping-service): Caddy bearer-token auth
+ * in front of podping-hivepinger, which writes PodPing 1.1 (custom_json id
+ * `pp_<medium>_<reason>`, `iris`), batches and dedups, and broadcasts to Hive.
+ * The request is the one MSP's notifyPodping sends:
+ * `GET <endpoint>?url=…&reason=…&medium=…` with `Authorization: Bearer <token>`.
+ *
+ * Until 2026-10-23 this class signed Hive ops itself, with custom_json id
+ * `podping` and `{"version":"1.0","reasons":[…],"urls":[…]}` — a shape no
+ * PodPing schema version accepts — so no reader, Podcast Index included, ever
+ * acted on one.
+ */
+import axios from 'axios';
 import { logger } from '../utils/logger.js';
 
+// podping-schemas podping.json, v1.0 + v1.1 mediums; hivepinger's Medium enum.
+export const PODPING_MEDIUMS = [
+  'mixed', 'podcast', 'podcastL', 'music', 'musicL', 'video', 'videoL', 'film', 'filmL',
+  'audiobook', 'audiobookL', 'newsletter', 'newsletterL', 'blog', 'blogL',
+  'publisher', 'publisherL', 'course', 'courseL'
+];
+export const PODPING_REASONS = ['update', 'live', 'liveEnd'];
+
+/** PodPing settings from the environment, then config.json's `podping` section. */
+export function podpingConfigFrom(config = {}, env = process.env) {
+  return {
+    enabled: config.podping?.enabled !== false,
+    timeout: config.podping?.timeout || 10000,
+    endpointUrl: env.PODPING_ENDPOINT_URL || config.podping?.endpointUrl || '',
+    bearerToken: env.PODPING_BEARER_TOKEN || config.podping?.bearerToken || ''
+  };
+}
+
+/**
+ * The pusher request URL, or null when any part is invalid — nothing is sent
+ * then. `noBroadcast` asks hivepinger to queue without broadcasting (testing).
+ */
+export function pusherRequestUrl(endpointUrl, { url, medium, reason, noBroadcast = false }) {
+  if (!PODPING_MEDIUMS.includes(medium) || !PODPING_REASONS.includes(reason)) return null;
+  let endpoint;
+  let feed;
+  try {
+    endpoint = new URL(endpointUrl);
+    feed = new URL(url);
+  } catch {
+    return null;
+  }
+  // The bearer token rides in a header, so plain http only to this machine.
+  const local = endpoint.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(endpoint.hostname);
+  if ((endpoint.protocol !== 'https:' && !local) || !['http:', 'https:'].includes(feed.protocol)) return null;
+  endpoint.search = new URLSearchParams({ url: feed.href, reason, medium }).toString();
+  if (noBroadcast) endpoint.searchParams.set('no_broadcast', 'true');
+  endpoint.searchParams.set('detailed_response', 'true');
+  return endpoint.href;
+}
+
 export class PodPing {
-  constructor(config = {}) {
-    this.enabled = config.enabled !== false; // Default to enabled if not specified
-    this.timeout = config.timeout || 10000; // Hive operations can take longer
-    this.hivePostingKey = config.hivePostingKey || null;
-    this.hiveUsername = config.hiveUsername || null;
-    this.hiveNode = config.hiveNode || 'https://api.hive.blog'; // Default Hive node
-    
-    // Initialize Hive client
-    if (this.enabled && this.hivePostingKey && this.hiveUsername) {
-      this.client = new Client([this.hiveNode], {
-        chainId: 'beeab0de00000000000000000000000000000000000000000000000000000000' // Hive mainnet chain ID
-      });
-    } else {
-      this.client = null;
-    }
+  /** `get` is axios.get, injectable for tests. */
+  constructor(config = {}, { get = axios.get } = {}) {
+    this.enabled = config.enabled !== false;
+    this.timeout = config.timeout || 10000;
+    this.endpointUrl = config.endpointUrl || '';
+    this.bearerToken = config.bearerToken || '';
+    this.get = get;
   }
 
   /**
-   * Send a PodPing notification for an RSS feed update
-   * This broadcasts a custom_json operation on the Hive blockchain
-   * Based on the official PodPing format: https://github.com/Podcastindex-org/podping-hivewriter
-   * @param {string} feedUrl - The RSS feed URL that was updated
-   * @param {string} reason - The reason for the ping: "update", "live", or "liveEnd" (default: "update")
-   * @returns {Promise<{success: boolean, message?: string, transactionId?: string}>}
+   * Queues one PodPing with the pusher. Never throws, and never logs the token.
+   * @param {string} feedUrl - the feed that changed, in the form readers know it by
+   * @param {{medium?: string, reason?: string, noBroadcast?: boolean}} options
+   * @returns {Promise<{success: boolean, message: string}>}
    */
-  async sendNotification(feedUrl, reason = 'update') {
-    if (!this.enabled) {
-      logger.debug('PodPing notifications are disabled');
-      return { success: false, message: 'PodPing disabled' };
+  async sendNotification(feedUrl, { medium = 'podcast', reason = 'update', noBroadcast = false } = {}) {
+    if (!this.enabled) return { success: false, message: 'PodPing disabled' };
+    if (!this.endpointUrl || !this.bearerToken) {
+      logger.warn('PodPing: pusher not configured (set PODPING_ENDPOINT_URL and PODPING_BEARER_TOKEN)');
+      return { success: false, message: 'PodPing pusher not configured' };
+    }
+    const requestUrl = pusherRequestUrl(this.endpointUrl, { url: feedUrl, medium, reason, noBroadcast });
+    if (!requestUrl) {
+      logger.warn(`PodPing: not sent, invalid request (url=${feedUrl}, medium=${medium}, reason=${reason})`);
+      return { success: false, message: 'Invalid PodPing request' };
     }
 
-    if (!feedUrl) {
-      logger.warn('PodPing: Cannot send notification - feed URL is empty');
-      return { success: false, message: 'Feed URL is empty' };
-    }
-
-    // Check if authentication is configured
-    if (!this.hivePostingKey || !this.hiveUsername) {
-      logger.warn('PodPing: Hive credentials not configured. PodPing requires Hive Posting Key and Username for authentication.');
-      logger.warn('PodPing: Add hivePostingKey and hiveUsername to config.json podping section');
-      return { success: false, message: 'Hive credentials not configured' };
-    }
-
-    if (!this.client) {
-      logger.warn('PodPing: Hive client not initialized');
-      return { success: false, message: 'Hive client not initialized' };
-    }
-
+    logger.info(`Sending PodPing (${medium}/${reason}) for feed: ${feedUrl}`);
     try {
-      logger.info(`Sending PodPing notification for feed: ${feedUrl}`);
-      
-      // Create PodPing custom_json operation
-      // Format based on podping-hivewriter: https://github.com/Podcastindex-org/podping-hivewriter
-      // The custom_json id is "podping", and the JSON contains version, reasons, and urls
-      const customJson = {
-        version: '1.0',
-        reasons: [reason], // "update", "live", or "liveEnd"
-        urls: [feedUrl]
-      };
-
-      // Validate reason
-      const validReasons = ['update', 'live', 'liveEnd'];
-      if (!validReasons.includes(reason)) {
-        logger.warn(`PodPing: Invalid reason "${reason}", defaulting to "update"`);
-        customJson.reasons = ['update'];
-      }
-
-      logger.debug(`PodPing custom_json: ${JSON.stringify(customJson)}`);
-
-      // Create private key from posting key string
-      const privateKey = PrivateKey.fromString(this.hivePostingKey);
-
-      // Create the operation
-      const operations = [
-        [
-          'custom_json',
-          {
-            required_auths: [],
-            required_posting_auths: [this.hiveUsername],
-            id: 'podping',
-            json: JSON.stringify(customJson)
-          }
-        ]
-      ];
-
-      logger.info(`Broadcasting PodPing transaction to Hive blockchain for user: ${this.hiveUsername}`);
-
-      // Broadcast the transaction
-      const result = await this.client.broadcast.sendOperations(operations, privateKey);
-
-      if (result && result.id) {
-        logger.info(`PodPing notification sent successfully! Transaction ID: ${result.id}`);
-        logger.info(`Feed URL: ${feedUrl}`);
-        return { 
-          success: true, 
-          message: 'Notification sent',
-          transactionId: result.id
-        };
-      } else {
-        logger.warn(`PodPing broadcast returned unexpected result: ${JSON.stringify(result)}`);
-        return { success: false, message: 'Unexpected broadcast result' };
-      }
+      const response = await this.get(requestUrl, {
+        timeout: this.timeout,
+        headers: { Authorization: `Bearer ${this.bearerToken}`, 'User-Agent': 'musicl-playlist-updater' }
+      });
+      // hivepinger's detailed response: { message: "enqueued" | "duplicate" | …, reason, medium, url }.
+      // A duplicate means the same ping is already queued, which is success.
+      const message = response?.data?.message || `HTTP ${response?.status}`;
+      logger.info(`PodPing queued for ${feedUrl}: ${message}`);
+      return { success: true, message };
     } catch (error) {
-      // Non-fatal error - log warning but don't throw
-      logger.warn(`Failed to send PodPing notification for ${feedUrl}: ${error.message}`);
-      
-      // Log more details for debugging
-      if (process.env.LOG_LEVEL === 'debug' || logger.level === 'debug') {
-        logger.debug(`PodPing error stack: ${error.stack}`);
-        logger.debug(`PodPing error details: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
-      }
-      
-      // Provide helpful error messages
-      if (error.message && error.message.includes('private key')) {
-        logger.warn('PodPing: Invalid Hive posting key. Please verify your posting key is correct.');
-      } else if (error.message && error.message.includes('insufficient')) {
-        logger.warn('PodPing: Insufficient Hive resources. Your account may need more Resource Credits (RC).');
-      } else if (error.message && error.message.includes('network') || error.message && error.message.includes('timeout')) {
-        logger.warn('PodPing: Network error. Please check your internet connection and Hive node availability.');
-      }
-      
-      return { success: false, message: error.message };
+      // Only status and body: error.config would carry the Authorization header.
+      const status = error.response?.status;
+      const body = typeof error.response?.data === 'string' ? error.response.data.slice(0, 200) : '';
+      const message = status ? `HTTP ${status}${body ? ` ${body}` : ''}` : error.message;
+      logger.warn(`Failed to send PodPing for ${feedUrl}: ${message}`);
+      return { success: false, message };
     }
   }
 }

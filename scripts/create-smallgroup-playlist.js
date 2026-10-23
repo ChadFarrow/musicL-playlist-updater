@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { execFileSync } from 'child_process';
 import { SmallGroupPlaylistAggregator } from '../src/services/SmallGroupPlaylistAggregator.js';
+import { podpingConfigFrom } from '../src/services/PodPing.js';
 import { logger } from '../src/utils/logger.js';
 
 /**
@@ -50,13 +51,7 @@ const fullConfig = {
   githubRepoBranch: config.github?.repoBranch || 'main',
   enableGitHubSync: config.github?.enableSync !== false,
   // Same PodPing settings as daily-update.js, so a manual publish pings too.
-  podping: {
-    enabled: config.podping?.enabled !== false,
-    timeout: config.podping?.timeout || 10000,
-    hiveNode: config.podping?.hiveNode || 'https://api.hive.blog',
-    hiveUsername: process.env.HIVE_USERNAME || config.podping?.hiveUsername || '',
-    hivePostingKey: process.env.HIVE_POSTING_KEY || config.podping?.hivePostingKey || ''
-  }
+  podping: podpingConfigFrom(config)
 };
 
 const dryRun = Boolean(ARGS['dry-run'] || process.env.SGS_DRY_RUN);
