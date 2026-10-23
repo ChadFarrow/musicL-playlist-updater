@@ -2,29 +2,41 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { RSSPlaylistGenerator } from '../src/services/RSSPlaylistGenerator.js';
 import { CommunityPlaylistAggregator } from '../src/services/CommunityPlaylistAggregator.js';
+import { SmallGroupPlaylistAggregator } from '../src/services/SmallGroupPlaylistAggregator.js';
 import { GitHubSync } from '../src/services/GitHubSync.js';
 import { logger } from '../src/utils/logger.js';
-import { withRetry } from '../src/utils/retry.js';
+import { withRetry, isAccessError } from '../src/utils/retry.js';
 
 const FEED_RETRIES = 2;
 const FEED_RETRY_DELAY_MS = 10000;
 
-// 403/404-style errors won't clear on retry and shouldn't fail the run
-function isAccessError(error) {
-  return !!error.message && (
-    error.message.includes('Status code 403') ||
-    error.message.includes('Status code 404') ||
-    error.message.includes('403') ||
-    error.message.includes('404') ||
-    error.message.includes('Forbidden') ||
-    error.message.includes('Not Found')
-  );
+// Surface an annotation (warning/notice) on the GitHub Actions run summary page
+function emitWorkflowAnnotation(level, title, message) {
+  console.log(`::${level} title=${title}::${message.replace(/\r?\n/g, ' ')}`);
 }
 
-// Surface a warning annotation on the GitHub Actions run summary page
 function emitWorkflowWarning(feedName, error) {
-  const message = `${feedName}: ${error.message}`.replace(/\r?\n/g, ' ');
-  console.log(`::warning title=Feed update failed::${message}`);
+  emitWorkflowAnnotation('warning', 'Feed update failed', `${feedName}: ${error.message}`);
+}
+
+// Run one aggregator playlist step (not a FEEDS.md feed) under the same
+// non-fatal policy as the feeds: 403/404 are skipped, any other error counts
+// as one error, and a failure surfaces a workflow warning instead of failing
+// the run. Returns { result } on success, else { error, accessError }.
+async function runAggregatorStep(label, generate) {
+  try {
+    logger.info(`Generating ${label}`);
+    return { result: await generate() };
+  } catch (error) {
+    emitWorkflowWarning(label, error);
+    if (isAccessError(error)) {
+      logger.warn(`Access denied or not found for ${label}: ${error.message}`);
+      logger.warn(`Skipping ${label} (non-fatal error)`);
+      return { error, accessError: true };
+    }
+    logger.error(`Error generating ${label}:`, error);
+    return { error, accessError: false };
+  }
 }
 
 // Load configuration (optional - use environment variables if config.json doesn't exist)
@@ -309,13 +321,11 @@ async function updateAllFeeds() {
     
     // Aggregate the LocalBitcoiners community podcastL playlist. This is NOT a
     // single RSS feed (it reads a JSON directory API), so it runs as its own
-    // step here rather than via FEEDS.md discovery. Same non-fatal policy as
-    // the feeds above: transient errors are retried, 403/404 are skipped, and a
-    // failure surfaces a workflow warning instead of failing the run.
-    try {
-      logger.info('Generating LocalBitcoiners community playlist');
+    // step here rather than via FEEDS.md discovery. Transient errors retry the
+    // whole step.
+    const community = await runAggregatorStep('community playlist', () => {
       const aggregator = new CommunityPlaylistAggregator(fullConfig);
-      const communityResult = await withRetry(() => aggregator.generate(), {
+      return withRetry(() => aggregator.generate(), {
         retries: FEED_RETRIES,
         delayMs: FEED_RETRY_DELAY_MS,
         shouldRetry: (error) => !isAccessError(error),
@@ -323,18 +333,45 @@ async function updateAllFeeds() {
           logger.warn(`Retry ${attempt}/${FEED_RETRIES} for community playlist after error: ${error.message}`);
         }
       });
-      logger.info(`Community playlist updated: ${communityResult.episodeCount} episode(s) (${communityResult.newCount} new)`);
+    });
+    if (community.result) {
+      logger.info(`Community playlist updated: ${community.result.episodeCount} episode(s) (${community.result.newCount} new)`);
       updatedCount++;
       processedCount++;
-    } catch (error) {
-      emitWorkflowWarning('community-playlist', error);
-      if (isAccessError(error)) {
-        logger.warn(`Access denied or not found for community playlist: ${error.message}`);
-        logger.warn('Skipping community playlist (non-fatal error)');
-      } else {
-        logger.error(`Error generating community playlist (after ${FEED_RETRIES} retries):`, error);
-        errorCount++;
+    } else if (!community.accessError) {
+      errorCount++;
+    }
+
+    // The Small Group Shows podcastL playlist: latest episodes from every show
+    // on smallgroupscoop.com/shows. Not wrapped in withRetry — it already
+    // retries each show's feed, and a show whose feed stays down keeps its
+    // previous episodes; per-show problems surface as annotations.
+    const smallGroup = await runAggregatorStep('Small Group playlist', () =>
+      new SmallGroupPlaylistAggregator(fullConfig).generate()
+    );
+    if (smallGroup.result) {
+      const result = smallGroup.result;
+      for (const { name, reason } of result.stale) {
+        emitWorkflowAnnotation('warning', 'Small Group feed down', `${name}: ${reason} (kept previous episodes)`);
       }
+      for (const { name, reason } of result.skipped) {
+        emitWorkflowAnnotation('warning', 'Small Group show skipped', `${name}: ${reason}`);
+      }
+      for (const { name, feedUrl } of result.discovered) {
+        emitWorkflowAnnotation('notice', 'New Small Group show', `${name} -> ${feedUrl}`);
+      }
+      for (const warning of result.warnings) {
+        emitWorkflowAnnotation('warning', 'Small Group playlist', warning);
+      }
+      if (result.changed) {
+        logger.info(`Small Group playlist updated: ${result.episodeCount} episode(s) from ${result.showCount} show(s)`);
+        updatedCount++;
+      } else {
+        logger.info('Small Group playlist unchanged (no new episodes)');
+      }
+      processedCount++;
+    } else if (!smallGroup.accessError) {
+      errorCount++;
     }
 
     // Update feeds.json with feeds from FEEDS.md if we used them

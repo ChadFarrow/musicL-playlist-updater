@@ -23,3 +23,15 @@ export async function withRetry(fn, { retries = 2, delayMs = 10000, shouldRetry,
     }
   }
 }
+
+// 403/404-style errors won't clear on retry and shouldn't fail the run
+export function isAccessError(error) {
+  return !!error.message && (
+    error.message.includes('Status code 403') ||
+    error.message.includes('Status code 404') ||
+    error.message.includes('403') ||
+    error.message.includes('404') ||
+    error.message.includes('Forbidden') ||
+    error.message.includes('Not Found')
+  );
+}

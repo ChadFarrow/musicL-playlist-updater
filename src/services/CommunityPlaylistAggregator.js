@@ -3,6 +3,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { logger } from '../utils/logger.js';
 import { withRetry } from '../utils/retry.js';
+import { escapeXml, extractRemoteItems } from '../utils/xml.js';
 
 /**
  * Aggregate the podcast episodes surfaced at localbitcoiners.com/feeds into ONE
@@ -132,7 +133,7 @@ export class CommunityPlaylistAggregator {
         if (this.githubSync) {
           const existing = await this.githubSync.getFileContent(this.githubPath);
           if (existing) {
-            for (const item of this.extractRemoteItems(existing)) {
+            for (const item of extractRemoteItems(existing)) {
               const key = `${item.feedGuid}::${item.itemGuid}`;
               if (seen.has(key)) continue;
               seen.add(key);
@@ -191,30 +192,6 @@ export class CommunityPlaylistAggregator {
     };
   }
 
-  /**
-   * Extract existing <podcast:remoteItem> entries from a published playlist.
-   * Same regex approach as RSSPlaylistGenerator (RSSPlaylistGenerator.js:79-94).
-   * Attribute values are XML-decoded back to canonical form so merge dedup keys
-   * match the fresh (raw) API values and buildPlaylistXml escapes exactly once.
-   */
-  extractRemoteItems(xmlContent) {
-    const items = [];
-    const remoteItemRegex = /<podcast:remoteItem[^>]*\/>/g;
-    let match;
-    while ((match = remoteItemRegex.exec(xmlContent)) !== null) {
-      const tag = match[0];
-      const feedGuidMatch = tag.match(/feedGuid=["']([^"']+)["']/);
-      const itemGuidMatch = tag.match(/itemGuid=["']([^"']+)["']/);
-      if (feedGuidMatch && itemGuidMatch) {
-        items.push({
-          feedGuid: decodeXmlEntities(feedGuidMatch[1]),
-          itemGuid: decodeXmlEntities(itemGuidMatch[1])
-        });
-      }
-    }
-    return items;
-  }
-
   buildPlaylistXml(remoteItems) {
     const pubDate = new Date().toUTCString();
     // Escape guid attribute values: some come from the API as permalink URLs
@@ -247,34 +224,4 @@ ${lines.join('\n')}
       mkdirSync(dir, { recursive: true });
     }
   }
-}
-
-/**
- * XML text-content escaping. Mirrors RSSPlaylistGenerator.escapeXml
- * (RSSPlaylistGenerator.js:503-511). feedGuid/itemGuid values are GUIDs and are
- * interpolated raw, matching the existing generator's convention.
- */
-function escapeXml(text) {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
-
-/**
- * Reverse of escapeXml, used when reading guid values back out of an existing
- * published playlist so they round-trip to their canonical (raw) form.
- */
-function decodeXmlEntities(text) {
-  if (!text) return '';
-  return String(text)
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&');
 }

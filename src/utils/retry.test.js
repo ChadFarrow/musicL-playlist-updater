@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { withRetry } from './retry.js';
+import { withRetry, isAccessError } from './retry.js';
 
 test('returns result on first success without retrying', async () => {
   let attempts = 0;
@@ -71,4 +71,17 @@ test('waits delayMs between attempts', async () => {
   }, { retries: 1, delayMs: 50 });
 
   assert.ok(Date.now() - start >= 45, 'expected at least ~50ms delay before retry');
+});
+
+test('isAccessError flags 403/404 responses so they are not retried', () => {
+  assert.equal(isAccessError(new Error('Request failed with status code 404')), true);
+  assert.equal(isAccessError(new Error('Status code 403')), true);
+  assert.equal(isAccessError(new Error('Not Found')), true);
+  assert.equal(isAccessError(new Error('Forbidden')), true);
+});
+
+test('isAccessError treats timeouts and server errors as transient', () => {
+  assert.equal(isAccessError(new Error('Request failed with status code 500')), false);
+  assert.equal(isAccessError(new Error('timeout of 30000ms exceeded')), false);
+  assert.equal(isAccessError(new Error('')), false);
 });

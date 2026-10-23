@@ -32,6 +32,10 @@ npm run rebuild          # Rebuild all playlists
 npm run create-localbitcoins-playlists            # Regenerate + publish now
 node scripts/create-localbitcoins-community-playlists.js --dry-run   # Preview XML to stdout
 
+# Small Group Shows podcastL playlist (optional; runs automatically in daily CI)
+npm run create-smallgroup-playlist                # Regenerate + publish now (only if episodes changed)
+node scripts/create-smallgroup-playlist.js --dry-run   # Preview XML to stdout
+
 # Daily update (used by GitHub Actions CI)
 node scripts/daily-update.js
 ```
@@ -85,6 +89,8 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 **Community playlist aggregator**: After the RSS feed loop, `daily-update.js` also runs `CommunityPlaylistAggregator` (`src/services/CommunityPlaylistAggregator.js`) as one extra step under the same non-fatal policy — so the community playlist refreshes automatically with the daily CI run; no manual invocation is needed. Unlike the RSS feeds, it is a *directory aggregator*: it pulls many shows' episodes from the `localbitcoiners.com/api/community-boosts` JSON API into a single **`podcastL`** playlist (`docs/localbitcoins-community-playlists.xml`), grow-only via merge with the existing file, with a stable hardcoded `<podcast:guid>`. It is intentionally **not** in `FEEDS.md` (the RSS discovery path expects a real source-feed RSS URL). Run standalone (optional, for an off-schedule refresh) via `npm run create-localbitcoins-playlists`; `--dry-run` prints XML to stdout (winston logs go to stderr, so `--dry-run > file.xml` captures clean XML). For local publishes the CLI wrapper auto-borrows a token from an authenticated `gh` CLI when `GITHUB_TOKEN` is unset (CI always sets it from `secrets.TOKEN`). Guide: `LOCALBITCOINERS-COMMUNITY-PLAYLIST.md`.
 
+**Small Group Shows aggregator**: After the community playlist, `daily-update.js` runs `SmallGroupPlaylistAggregator` (`src/services/SmallGroupPlaylistAggregator.js`), which builds one flat **`podcastL`** playlist (`docs/smallgroup-shows-playlist.xml`) of the latest 10 episodes from every show listed on https://smallgroupscoop.com/shows/, newest first across all shows. It's rolling, not grow-only: each show's oldest episode drops out as new ones come in. The show list is read from that page every run, and shows that join or leave are picked up automatically. The site publishes no feed URLs, so feeds come from the verified `KNOWN_FEEDS` map in the service (add a show there if discovery picks the wrong feed), from the run state, or from best-effort discovery through the show's own site. Run state (episode dates and each show's feed) lives in the target repo at `state/smallgroup-shows-playlist.json`, outside `docs/`. The state is what lets a show whose feed is down keep its previous episodes, and what lets a broken shows page fall back to the last known list. The step only pushes, and PodPings, when the episode list changes. It has no outer retry, because each feed is already retried. Stale, skipped, and newly discovered shows surface as `::warning::`/`::notice::` annotations. Like the community playlist, it's not in `FEEDS.md`. HTML is parsed with regexes: **don't add cheerio** while CI runs Node 18, because the locked cheerio needs Node ≥20.18.1 and `daily-update.js` imports every aggregator when it loads. Design: `docs/superpowers/specs/2026-10-23-smallgroup-shows-playlist-design.md`.
+
 ## Configuration
 
 **Feed Config**: `src/config/feeds.json`
@@ -106,7 +112,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 ## Key Details
 
 - ES Module project (`"type": "module"`) requiring Node >= 18.0.0
-- Tests use the Node built-in test runner (`npm test` runs `src/**/*.test.js`); currently `src/utils/retry.test.js`
+- Tests use the Node built-in test runner (`npm test` runs `src/**/*.test.js`): `src/utils/retry.test.js`, `src/utils/xml.test.js`, `src/services/SmallGroupPlaylistAggregator.test.js`
 - Playlists output locally to `./playlists/{playlistId}.xml` (gitignored), then synced to target repo `docs/` via GitHub Contents API
 - The `playlists/` directory is a local temp workspace only — playlist XML files are NOT tracked in this repo, they live exclusively in the target repo (`chadf-musicl-playlists/docs/`)
 - Only `feeds.json` changes are git-committed in CI; playlist XML files are pushed to the separate target repo via API
