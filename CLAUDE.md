@@ -94,7 +94,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 ## Configuration
 
 **Feed Config**: `src/config/feeds.json`
-- `rssFeeds[]` - Array of feed objects with `id`, `rssUrl`, `playlistId`, `checkIntervalMinutes`, `lastEpisodeGuid`, `lastChecked`, and playlist metadata
+- `rssFeeds[]` - Array of feed objects with `id`, `rssUrl`, `playlistId`, `playlistGuid`, `checkIntervalMinutes`, `lastEpisodeGuid`, `lastChecked`, and playlist metadata. `playlistGuid` is the playlist's `<podcast:guid>`, its identity in Podcast Index, favorites and boostagrams — never change one. Each existing entry holds the guid Podcast Index has for that feed; until 2026-10-23 the generator minted a new guid on every build. `stablePlaylistGuid` (`RSSPlaylistGenerator.js`) picks it: configured, else the published file's, else a new one, and the generator writes the result back to the feed config so `feeds.json` keeps it
 - `playlists[]` - Used in `playlist` monitor mode
 - `settings.monitorMode` - Determines which service handles updates (`rss`, `playlist`, or `rss-to-playlist`)
 - `settings.productionMode` - Production flag
@@ -126,7 +126,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 When adding a new feed, three things must be done for the daily CI to pick it up:
 
-1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`
+1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`. Leave `playlistGuid` out: the first build keeps the seed playlist's `<podcast:guid>` (or mints one) and saves it
 2. **Add entry to `FEEDS.md` in the target repo** (`chadf-musicl-playlists`) — the daily script reads this as the source of truth
 3. **Seed an initial playlist XML in the target repo** (`docs/{playlistId}.xml`) — the daily script's `discoverPlaylists()` only matches feeds that already have an XML file in `docs/`, and it requires a `<podcast:txt purpose="source-feed">` tag in the XML to extract the RSS URL. Without this, the feed silently gets skipped even if it's in `FEEDS.md`
 
