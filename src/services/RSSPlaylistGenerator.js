@@ -4,6 +4,7 @@ import { logger } from '../utils/logger.js';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { extractChannelGuid } from './SmallGroupPlaylistAggregator.js';
+import { notifyPodcastIndex } from './PodcastIndexNotify.js';
 
 /**
  * The <podcast:guid> a musicL playlist is published under. It is the feed's
@@ -33,6 +34,7 @@ export class RSSPlaylistGenerator {
     });
     this.githubSync = null;
     this.podping = null;
+    this.notifyIndex = notifyPodcastIndex;
   }
 
   async initializePodPing() {
@@ -367,6 +369,15 @@ export class RSSPlaylistGenerator {
             const githubPath = `docs/${feedConfig.playlistId}.xml`;
             await this.githubSync.updateFile(githubPath, playlistXML, `Auto-update playlist from ${feedConfig.name} RSS feed - Added ${newEpisodes.length} new episode(s)`);
             logger.info(`Synced playlist to GitHub: ${githubPath}`);
+
+            // Podcast Index does not act on the PodPing below, so tell it
+            // directly, by feed ID (see PodcastIndexNotify.js). Never throws.
+            if (feedConfig.piFeedId) {
+              const notified = await this.notifyIndex(feedConfig.piFeedId);
+              const line = `Podcast Index notify for ${feedConfig.name} (feed ${feedConfig.piFeedId}): ${notified.message}`;
+              if (notified.success) logger.info(line);
+              else logger.warn(line);
+            }
             
             // Send PodPing notification after successful GitHub sync
             // PodPing should notify for the playlist feed URL (not the source RSS feed)
