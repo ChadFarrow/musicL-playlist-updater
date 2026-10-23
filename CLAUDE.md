@@ -29,12 +29,15 @@ npm run build            # Build playlists (build-music-playlist.js)
 npm run rebuild          # Rebuild all playlists
 
 # Community podcastL playlist aggregator (optional; runs automatically in daily CI)
-npm run create-localbitcoins-playlists            # Regenerate + publish now
+npm run create-localbitcoins-playlists            # Regenerate + publish now (only if the playlist XML changed)
 node scripts/create-localbitcoins-community-playlists.js --dry-run   # Preview XML to stdout
 
 # Small Group Shows podcastL playlist (optional; runs automatically in daily CI)
 npm run create-smallgroup-playlist                # Regenerate + publish now (only if the playlist XML changed)
 node scripts/create-smallgroup-playlist.js --dry-run   # Preview XML to stdout
+
+# PodPing through the msp-podping-service pusher (needs PODPING_ENDPOINT_URL + PODPING_BEARER_TOKEN)
+npm run test-podping -- <feed-url> --medium musicL   # Queue only (no_broadcast); add --broadcast to send to Hive
 
 # Daily update (used by GitHub Actions CI)
 node scripts/daily-update.js
@@ -103,7 +106,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 **Config Loading Order**: Environment variables → `./config.json` → hardcoded defaults → `src/config/feeds.json` for feed/monitor settings
 
-**Environment Variables** (see `env.example`):
+**Environment Variables** (see `env.example`). In CI, `daily-feed-update.yml` maps the repo secrets `TOKEN` → `GITHUB_TOKEN`, `PODPING_ENDPOINT_URL` and `PODPING_BEARER_TOKEN`; the `HIVE_USERNAME`/`HIVE_POSTING_KEY` secrets are no longer read (since 2026-10-23):
 - `GITHUB_TOKEN` - GitHub API access for the target playlist repo
 - `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME` - Target repo (`ChadFarrow/chadf-musicl-playlists`)
 - `PODPING_ENDPOINT_URL`, `PODPING_BEARER_TOKEN` - the msp-podping-service pusher URL (trailing slash) and its bearer token (`PODPING_SHARED_SECRET` on Railway). Test with `npm run test-podping -- <feed-url> --medium musicL`, which only queues (`no_broadcast`) unless given `--broadcast`
@@ -114,15 +117,16 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 ## Key Details
 
 - ES Module project (`"type": "module"`) requiring Node >= 18.0.0
-- Tests use the Node built-in test runner (`npm test` runs `src/**/*.test.js`): `src/utils/retry.test.js`, `src/utils/xml.test.js`, `src/services/SmallGroupPlaylistAggregator.test.js`
+- Tests use the Node built-in test runner (`npm test` runs `src/**/*.test.js`), one file beside each module it pins: `src/utils/retry.test.js`, `src/utils/xml.test.js` (incl. `sameApartFromBuildDates`), `src/services/RSSPlaylistGenerator.test.js` (stable `playlistGuid`), `src/services/PodcastIndexNotify.test.js` (pubnotify by `piFeedId`), `src/services/PodPing.test.js` (the pusher request, `musicL` + refs/heads URL), `src/services/CommunityPlaylistAggregator.test.js` (no push when only dates change, no `source-feed`), `src/services/SmallGroupPlaylistAggregator.test.js`, and `src/services/GitHubSync.test.js` (`parseFeedsMarkdown` on the real FEEDS.md). Network calls are injected or stubbed; a test never reaches GitHub, PI or the pusher
+- `@hiveio/dhive` is no longer imported anywhere (PodPing goes through the pusher since 2026-10-23). It stays in `package.json` because `node_modules/` is committed; removing it is its own change
 - Playlists output locally to `./playlists/{playlistId}.xml` (gitignored), then synced to target repo `docs/` via GitHub Contents API
 - The `playlists/` directory is a local temp workspace only — playlist XML files are NOT tracked in this repo, they live exclusively in the target repo (`chadf-musicl-playlists/docs/`)
 - Only `feeds.json` changes are git-committed in CI; playlist XML files are pushed to the separate target repo via API
 - Logs written to `./logs/combined.log` and `./logs/error.log` (Winston); `logs/` is gitignored (both files are untracked). The Winston console transport routes **all** levels to **stderr**, leaving stdout for actual program output (e.g. `--dry-run` XML) and GitHub Actions workflow commands (`::warning::` via direct `console.log`)
-- GitHub Actions workflow (`.github/workflows/daily-feed-update.yml`) runs daily at 7 AM UTC (2 AM EST)
+- GitHub Actions workflow (`.github/workflows/daily-feed-update.yml`) is scheduled daily at 7 AM UTC (2 AM EST), but GitHub starts it hours late: 11:23–14:21 UTC for the 8 runs of 2026-10-16 to 2026-10-23. `workflow_dispatch` runs it now; `force_update=true` rebuilds and pushes every musicL playlist (one commit, one PI notify and one PodPing each)
 - RSSMonitor normalizes both `feeds` and `rssFeeds` keys in config
 - Generated playlists use `<podcast:medium>musicL</podcast:medium>` and group tracks by episode using `<podcast:txt purpose="episode">` markers
-- The `FEEDS.md` file in the target repo serves as the source of truth for which playlists to manage; `feeds.json` is the fallback
+- The `FEEDS.md` file in the target repo serves as the source of truth for which **musicL** playlists to manage (the podcastL entries it lists are dropped by `parseFeedsMarkdown`'s ID filter and run as their own steps); `feeds.json` is the fallback
 
 ## Adding a New Feed
 
