@@ -50,3 +50,12 @@ export function extractRemoteItems(xmlContent) {
   }
   return items;
 }
+
+/**
+ * True when two builds of the playlist differ only in <pubDate> and
+ * <lastBuildDate>, which change on every run.
+ */
+export function sameApartFromBuildDates(a, b) {
+  const strip = (xml) => String(xml).replace(/<(pubDate|lastBuildDate)>[^<]*<\/\1>/g, '');
+  return strip(a) === strip(b);
+}

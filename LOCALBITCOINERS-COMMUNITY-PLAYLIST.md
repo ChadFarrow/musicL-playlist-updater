@@ -64,6 +64,9 @@ skipped, and a persistent failure emits a `::warning::` annotation instead of fa
 run. It is intentionally **not** listed in `FEEDS.md` — the RSS discovery path expects a
 real source-feed RSS URL and would choke on the JSON API, so this runs as its own step.
 
+A run pushes only when the playlist changed: when the new XML matches the published file
+apart from `<pubDate>`/`<lastBuildDate>`, nothing is committed to the target repo.
+
 ## Requirements
 
 - Network access to `localbitcoiners.com`.

@@ -330,8 +330,13 @@ async function updateAllFeeds() {
       });
     });
     if (community.result) {
-      logger.info(`Community playlist updated: ${community.result.episodeCount} episode(s) (${community.result.newCount} new)`);
-      updatedCount++;
+      const { changed, episodeCount, newCount } = community.result;
+      if (changed) {
+        logger.info(`Community playlist updated: ${episodeCount} episode(s) (${newCount} from latest snapshot)`);
+        updatedCount++;
+      } else {
+        logger.info(`Community playlist unchanged: ${episodeCount} episode(s)`);
+      }
       processedCount++;
     } else if (!community.accessError) {
       errorCount++;
