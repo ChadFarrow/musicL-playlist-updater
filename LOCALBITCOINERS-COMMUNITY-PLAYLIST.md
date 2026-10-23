@@ -61,8 +61,11 @@ Diagnostic logs go to **stderr**, so `--dry-run > file.xml` captures clean XML o
 `scripts/daily-update.js` runs this aggregator as an extra step after the RSS feed loop,
 under the same non-fatal error policy: transient errors are retried, `403`/`404` are
 skipped, and a persistent failure emits a `::warning::` annotation instead of failing the
-run. It is intentionally **not** listed in `FEEDS.md` — the RSS discovery path expects a
-real source-feed RSS URL and would choke on the JSON API, so this runs as its own step.
+run. `FEEDS.md` lists it in its podcastL section, for reference, but the per-feed RSS loop
+never takes it: `parseFeedsMarkdown` keeps only IDs that contain `-music-playlist`,
+`-muic-playlist` or `-musicl-`. The playlist writes no `<podcast:txt purpose="source-feed">`:
+the JSON API is not a feed, and boostmebitch downloads that tag's URL (4.3 MB of JSON here)
+as the show the playlist was built from.
 
 A run pushes only when the playlist changed: when the new XML matches the published file
 apart from `<pubDate>`/`<lastBuildDate>`, nothing is committed to the target repo.
