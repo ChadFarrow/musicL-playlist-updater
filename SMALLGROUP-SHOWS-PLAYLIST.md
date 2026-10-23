@@ -86,8 +86,11 @@ name the shows web page, which that loop would then try to parse as RSS.
 
 ## Artwork
 
-Upload an image to `docs/` in `chadf-musicl-playlists`, then set `PLAYLIST_IMAGE_URL` in
-`src/services/SmallGroupPlaylistAggregator.js` to its raw.githubusercontent.com URL.
-The next run publishes it, even on a day with no new episode.
+The cover is `docs/smallgroup-shows-playlist-art.png` in `chadf-musicl-playlists` (1024x1024 PNG),
+linked by `PLAYLIST_IMAGE_URL` in `src/services/SmallGroupPlaylistAggregator.js`. To change it,
+replace that file (same name, no code change), or upload a new one to `docs/` and point
+`PLAYLIST_IMAGE_URL` at its raw.githubusercontent.com URL. A new URL is published on the next run,
+even on a day with no new episode; a replaced file at the same URL needs no run, though podcast
+apps may keep the old image cached for a while.
 
 Design: `docs/superpowers/specs/2026-10-23-smallgroup-shows-playlist-design.md`.
