@@ -43,7 +43,8 @@ const PLAYLIST_IMAGE_URL =
 // docs/ so it is never served or discovered as a playlist.
 const STATE_PATH = `state/${PLAYLIST_ID}.json`;
 
-// Verified feeds for the shows on the page (checked 2026-10-23). A show that
+// Verified feeds for the shows on the page (checked 2026-10-23; the last 6
+// added 2026-10-24, when their website discovery missed or misfired). A show that
 // isn't listed here is discovered from its own website. `feedGuid` overrides
 // feeds with no <podcast:guid> whose Podcast Index guid can't be derived from
 // their current URL.
@@ -53,8 +54,13 @@ const KNOWN_FEEDS = {
     feedUrl: 'https://www.absna6pack.com/?format=rss',
     feedGuid: '054525df-0123-5647-8421-dd9083e56636'
   },
+  'accidentally-interesting': { name: 'Accidentally Interesting', feedUrl: 'https://accidentallyinteresting.com/feed.xml' },
   'before-the-sch3m3s': { name: 'Before The Sch3m3s', feedUrl: 'https://music.behindthesch3m3s.com/b4ts%20feed/feed.xml' },
   'behind-the-sch3m3s': { name: 'Behind the Sch3m3s', feedUrl: 'https://feed.behindthesch3m3s.com/feed.xml' },
+  'between-the-sch3m3s': {
+    name: 'Between The Sch3m3s',
+    feedUrl: 'https://serve.podhome.fm/rss/c5e5322c-0144-498b-b8d9-a4eb958cf98a'
+  },
   'bowl-after-bowl': { name: 'Bowl After Bowl', feedUrl: 'https://feed.bowlafterbowl.com/feed.xml' },
   'chad-and-reeds-podcast': {
     name: 'Chad and Reeds Podcast',
@@ -69,8 +75,19 @@ const KNOWN_FEEDS = {
   'lightning-thrashes': { name: 'Lightning Thrashes', feedUrl: 'https://sirlibre.com/lightning-thrashes-rss.xml' },
   'millennial-media-offensive': { name: 'Millennial Media Offensive', feedUrl: 'https://mmo.show/wp-content/feed.xml' },
   'mutton-mead-music': { name: 'Mutton, Mead & Music', feedUrl: 'https://mmmusic.show/podcast/feed.xml' },
+  'nick-the-rat-radio': {
+    name: 'Nick the Rat Radio',
+    feedUrl: 'https://nicktherat.com/radio/feed.xml',
+    feedGuid: '23cd2e78-6042-5834-9ca8-34feca4d02b9'
+  },
   'rare-encounter': { name: 'Rare Encounter', feedUrl: 'https://rareencounter.net/feed.xml' },
-  'revdocs-revival': { name: "RevDoc's Revival", feedUrl: 'https://folkhour.com/feed.xml' }
+  'revdocs-revival': { name: "RevDoc's Revival", feedUrl: 'https://folkhour.com/feed.xml' },
+  'rollz-radio': { name: 'Rollz Radio', feedUrl: 'https://serve.podhome.fm/rss/8f2eb0c0-3627-59cf-85fc-4e252ddb6954' },
+  'v4v-music-spotlight': {
+    name: 'V4V Music Spotlight',
+    feedUrl: 'https://phafe.com/wp-content/uploads/rssfeed/v4v_music_spotlight/V4V_Music_Spotlight.xml'
+  },
+  v4vmusic: { name: 'v4vmusic', feedUrl: 'https://cdn.kolomona.com/podcasts/v4vmusic/v4vmusic-rss.xml' }
 };
 
 const USER_AGENT =
