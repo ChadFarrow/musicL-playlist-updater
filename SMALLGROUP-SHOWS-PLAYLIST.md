@@ -39,7 +39,7 @@ The show list is read from smallgroupscoop.com/shows on every run, so shows that
 or leave are picked up automatically. The site publishes no feed URLs, so each show's
 feed comes from (in order):
 
-1. `KNOWN_FEEDS` in `src/services/SmallGroupPlaylistAggregator.js`: the 13 launch
+1. `KNOWN_FEEDS` in `src/services/SmallGroupPlaylistAggregator.js`: all 19
    shows, each verified. **If discovery picks the wrong feed for a new show, add it here.**
 2. The feed remembered in the run state.
 3. Discovery: the show's own website (linked from its smallgroupscoop page). The run
