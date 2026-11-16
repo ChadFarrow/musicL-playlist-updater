@@ -29,6 +29,22 @@ export function podpingFeedUrl(config, playlistId) {
   return `https://raw.githubusercontent.com/${config.githubRepoOwner}/${config.githubRepoName}/refs/heads/${config.githubRepoBranch || 'main'}/docs/${playlistId}.xml`;
 }
 
+/**
+ * ChadF's publisher feed (docs/chadf-musicl-publisher.xml in the playlists
+ * repo). It lists every musicL playlist this tool writes, and each playlist
+ * names it back in <podcast:publisher>. The publisher spec trusts that link only
+ * when it goes both ways, so a rebuilt playlist must keep the back-link — a
+ * hand edit to the published file does not survive the next rebuild.
+ *
+ * The back-link has no itemGuid, so every reader that collects tracks (the
+ * existing-item scan in generatePlaylistFromRSS, generate_greatest_hits.py,
+ * boostmebitch, stablekraft) skips it.
+ */
+export const PUBLISHER_FEED = Object.freeze({
+  guid: 'a778e463-ecc3-5219-8f05-f33b3983e173',
+  url: 'https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/chadf-musicl-publisher.xml'
+});
+
 export class RSSPlaylistGenerator {
   constructor(config) {
     this.config = config;
@@ -510,11 +526,16 @@ export class RSSPlaylistGenerator {
       }
     }
 
+    // Decode, then escape: a bare "&" (MMM's title) made the whole playlist
+    // invalid XML, and a title read back from a published file is already
+    // escaped, so escaping it as-is would give "&amp;amp;".
+    const text = (value) => this.escapeXml(this.decodeXmlEntities(value));
+
     return `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
-    <author>${feedConfig.playlistAuthor || 'ChadF'}</author>
-    <title>${feedConfig.playlistTitle || ''}</title>
-    <description>${feedConfig.playlistDescription || ''}</description>
+    <author>${text(feedConfig.playlistAuthor || 'ChadF')}</author>
+    <title>${text(feedConfig.playlistTitle || '')}</title>
+    <description>${text(feedConfig.playlistDescription || '')}</description>
     <link>${feed.link || feedConfig.rssUrl || ''}</link>
     <podcast:txt purpose="source-feed">${feedConfig.rssUrl}</podcast:txt>
     <language>en</language>
@@ -523,6 +544,9 @@ export class RSSPlaylistGenerator {
     <image>
       <url>${feedConfig.playlistImageUrl || feed.image?.url || ''}</url>
     </image>
+    <podcast:publisher>
+      <podcast:remoteItem medium="publisher" feedGuid="${PUBLISHER_FEED.guid}" feedUrl="${PUBLISHER_FEED.url}"/>
+    </podcast:publisher>
     <podcast:medium>musicL</podcast:medium>
     <podcast:guid>${guid}</podcast:guid>
 ${groupedOutput.join('\n')}
