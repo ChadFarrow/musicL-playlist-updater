@@ -146,6 +146,7 @@ function trackCount(xml) {
 
 test('the publisher feed is ChadF\'s, under the URL Podcast Index lists playlists by', () => {
   assert.equal(PUBLISHER_FEED.guid, 'a778e463-ecc3-5219-8f05-f33b3983e173');
+  assert.equal(PUBLISHER_FEED.rel, 'curator');
   assert.equal(
     PUBLISHER_FEED.url,
     'https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/chadf-musicl-publisher.xml'
@@ -158,6 +159,9 @@ test('a rebuilt playlist links back to the publisher feed, before its medium', a
   const links = backLinks(pushed[0]);
   assert.equal(links.length, 1);
   assert.match(links[0], /medium="publisher"/);
+  // The role, the same on both sides of the link: the publisher feed's entry for
+  // this playlist says rel="curator" too (podcast-namespace PR #793).
+  assert.match(links[0], /rel="curator"/);
   assert.match(links[0], new RegExp(`feedGuid="${PUBLISHER_FEED.guid}"`));
   assert.ok(links[0].includes(`feedUrl="${PUBLISHER_FEED.url}"`));
   assert.doesNotMatch(links[0], /itemGuid/);

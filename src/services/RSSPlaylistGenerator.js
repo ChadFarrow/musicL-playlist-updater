@@ -39,9 +39,15 @@ export function podpingFeedUrl(config, playlistId) {
  * The back-link has no itemGuid, so every reader that collects tracks (the
  * existing-item scan in generatePlaylistFromRSS, generate_greatest_hits.py,
  * boostmebitch, stablekraft) skips it.
+ *
+ * `rel` is ChadF's role on the playlist, written the same on both sides of the link
+ * (podcast-namespace PR #793). musicindex.org counts a role only when both sides agree,
+ * and with no agreed role it calls a publisher an artist when the names match. ChadF
+ * makes playlists, not music (Chad, 2026-11-16: "curator", proposed upstream).
  */
 export const PUBLISHER_FEED = Object.freeze({
   guid: 'a778e463-ecc3-5219-8f05-f33b3983e173',
+  rel: 'curator',
   url: 'https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/refs/heads/main/docs/chadf-musicl-publisher.xml'
 });
 
@@ -545,7 +551,7 @@ export class RSSPlaylistGenerator {
       <url>${feedConfig.playlistImageUrl || feed.image?.url || ''}</url>
     </image>
     <podcast:publisher>
-      <podcast:remoteItem medium="publisher" feedGuid="${PUBLISHER_FEED.guid}" feedUrl="${PUBLISHER_FEED.url}"/>
+      <podcast:remoteItem medium="publisher" rel="${PUBLISHER_FEED.rel}" feedGuid="${PUBLISHER_FEED.guid}" feedUrl="${PUBLISHER_FEED.url}"/>
     </podcast:publisher>
     <podcast:medium>musicL</podcast:medium>
     <podcast:guid>${guid}</podcast:guid>
