@@ -125,7 +125,7 @@
       "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/flowgnar-playlist-art.webp",
       "enabled": true,
       "lastChecked": "2026-11-16T16:46:17.184Z",
-      "lastEpisodeGuid": "Oncetold-20800308",
+      "lastEpisodeGuid": null,
       "checkIntervalMinutes": 1440
     },
     {
