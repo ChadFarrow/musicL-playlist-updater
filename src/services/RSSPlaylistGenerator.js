@@ -110,6 +110,14 @@ export class RSSPlaylistGenerator {
         logger.warn(`Could not fetch raw RSS XML: ${error.message}`);
       }
 
+      // Without the raw RSS no published track can be matched to the feed, so
+      // every one would look removed, and the push held only episode markers
+      // (issue #17). Publish nothing; the caller reports the failure.
+      if (!rssXml) {
+        logger.warn(`Not publishing ${feedConfig.playlistId}: the raw RSS of ${feedConfig.name} could not be read`);
+        return { success: false, error: 'Could not fetch the raw RSS XML' };
+      }
+
       // Get existing playlist and merge with new episodes
       let existingContent = null;
       let existingRemoteItems = [];
@@ -123,10 +131,19 @@ export class RSSPlaylistGenerator {
             if (existingContent) {
               // Always extract existing remoteItems to preserve them
               {
-                // Match remoteItem tags (may span multiple lines or be on single line)
-                const remoteItemRegex = /<podcast:remoteItem[^>]*\/>/g;
+                // Match remoteItem tags (may span multiple lines or be on single line),
+                // and the episode marker each one sits under, so a track whose episode
+                // has left the feed keeps that episode when it is preserved below.
+                const remoteItemRegex = /<podcast:txt\s+purpose=["']episode["']\s*>([^<]*)<\/podcast:txt>|<podcast:remoteItem[^>]*\/>/g;
                 let match;
+                let markerTitle = null;
                 while ((match = remoteItemRegex.exec(existingContent)) !== null) {
+                  if (match[1] !== undefined) {
+                    // Not trimmed: a marker is the feed's title as written, and
+                    // flowgnar has one with a leading space
+                    markerTitle = this.decodeXmlEntities(match[1]);
+                    continue;
+                  }
                   const xml = match[0];
                   const itemGuidMatch = xml.match(/itemGuid=["']([^"']+)["']/);
                   const feedGuidMatch = xml.match(/feedGuid=["']([^"']+)["']/);
@@ -134,7 +151,8 @@ export class RSSPlaylistGenerator {
                     const remoteItem = {
                       itemGuid: itemGuidMatch[1],
                       feedGuid: feedGuidMatch[1],
-                      xml: xml.trim()
+                      xml: xml.trim(),
+                      episodeTitle: markerTitle
                     };
                     existingRemoteItems.push(remoteItem);
                     existingItemsMap.set(remoteItem.itemGuid, remoteItem);
@@ -367,7 +385,9 @@ export class RSSPlaylistGenerator {
             }
             allRemoteItems.push({
               xml: normalizedXml,
-              episodeTitle: 'Preserved Tracks',  // These are from episodes no longer in RSS feed
+              // The episode it was published under; generateMusicLXML writes the
+              // episodes no longer in the feed after the feed's own
+              episodeTitle: existingItem.episodeTitle || 'Preserved Tracks',
               episodeIndex: 9999  // Put at end
             });
             preservedFromMissingEpisodes.push(existingItem.itemGuid);
@@ -530,6 +550,16 @@ export class RSSPlaylistGenerator {
         // Episode has no tracks - add comment
         groupedOutput.push(`    <!-- no tracks -->`);
       }
+    }
+
+    // Preserved tracks from episodes that are no longer in the feed, under the
+    // episode they were published under, in the published order. Before
+    // issue #17 they were counted as kept but never written.
+    const feedEpisodeTitles = new Set(allEpisodeTitles);
+    for (const [episodeTitle, tracks] of tracksByEpisode) {
+      if (feedEpisodeTitles.has(episodeTitle)) continue;
+      groupedOutput.push(`    <podcast:txt purpose="episode">${this.escapeXml(episodeTitle)}</podcast:txt>`);
+      groupedOutput.push(...tracks);
     }
 
     // Decode, then escape: a bare "&" (MMM's title) made the whole playlist
