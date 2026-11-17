@@ -18,10 +18,13 @@ Other files in this repo (`GITHUB-ACTIONS-SETUP.md`, `SETUP-GUIDE.md`, and other
 ## What the job does
 
 1. It reads `FEEDS.md` from `chadf-musicl-playlists` to get the list of playlists.
-2. For each feed in `src/config/feeds.json`, it reads the source RSS feed. If a new episode is available, it updates the playlist.
+2. For each playlist in `FEEDS.md`, it takes the feed settings and state (for example `lastEpisodeGuid`) from `src/config/feeds.json`, and it reads the source RSS feed. It rebuilds the playlist if a new episode is available, if `lastEpisodeGuid` is empty, or if `FORCE_UPDATE=true`. If it cannot read `FEEDS.md`, it uses the feeds in `src/config/feeds.json` as the list.
 3. It makes the community playlists (Local Bitcoiners) and the Small Group Scoop shows playlist.
-4. It writes each changed playlist to `chadf-musicl-playlists/docs/` with the GitHub API. Each write starts the Greatest Hits job in that repo.
-5. For each changed playlist, it tells Podcast Index to read the feed again (`/hub/pubnotify`, no API key necessary). It also sends a podping through the msp-podping-service pusher.
+4. It writes each changed playlist to `chadf-musicl-playlists/docs/` with the GitHub API. A write to a `docs/*-music-playlist.xml` file starts the Greatest Hits job in that repo. These writes do not start it: the community playlist, the Small Group playlist and its `state/` file, and `MMT-muic-playlist.xml` (the file name has "muic", not "music").
+5. It sends notifications for each changed playlist:
+   - A playlist from step 2 (musicL): it tells Podcast Index to read the feed again (`/hub/pubnotify?id=<piFeedId>`, with the `piFeedId` from `src/config/feeds.json`, no API key necessary). It also sends a podping (`medium=musicL`) through the msp-podping-service pusher.
+   - The Small Group playlist: a podping (`medium=podcastL`) only. It does not tell Podcast Index.
+   - The Local Bitcoiners community playlist: no Podcast Index notification and no podping.
 6. It commits `src/config/feeds.json` to this repo, if it changed.
 
 A feed that fails (for example, HTTP 403 or 404) gives a warning. It does not stop the job.
@@ -82,7 +85,7 @@ git push
 To push, the clone needs git credentials (the same token in a credential helper, or an SSH deploy key with write access).
 
 ### 4. Then run Greatest Hits
-The playlist writes go to `chadf-musicl-playlists` through the API. On GitHub, each write starts the Greatest Hits job there. On a local run, that does not occur, so run Greatest Hits after this job. See `RUNNING.md` in `chadf-musicl-playlists`.
+The playlist writes go to `chadf-musicl-playlists` through the API, also on a local run. A write to a `docs/*-music-playlist.xml` file is a push to `main` in that repo, so it starts the Greatest Hits job there while that job runs on GitHub Actions (see step 4 for the files that do not start it). If you also move the jobs of `chadf-musicl-playlists` off GitHub, run Greatest Hits after this job. See `RUNNING.md` in `chadf-musicl-playlists`.
 
 ### 5. Schedule
 Use a systemd timer (`OnCalendar=*-*-* 07:00:00 UTC`, `Persistent=true`) or cron. If you run the job locally, disable the `schedule:` trigger in `.github/workflows/daily-feed-update.yml`. If you do not, GitHub and your server do the same updates two times.
