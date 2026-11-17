@@ -93,7 +93,12 @@ const EPISODE_156 = { title: 'Homegrown Hits - Episode 156', guid: 'episode-156'
 
 // The raw-RSS fetch reads the feeds from a local server, by path. A URL on
 // port 9, where nothing listens, makes that fetch fail.
-const FEEDS = new Map([['/feed.xml', RAW_RSS], ['/episode-156.xml', RAW_RSS_156]]);
+const FEEDS = new Map([
+  ['/feed.xml', RAW_RSS],
+  ['/episode-156.xml', RAW_RSS_156],
+  // A host error page served with 200, read after rss-parser read the feed.
+  ['/error-page.xml', '<html><body>Service temporarily unavailable</body></html>']
+]);
 const server = createServer((req, res) => {
   const body = FEEDS.get(req.url);
   res.statusCode = body === undefined ? 404 : 200;
@@ -292,23 +297,23 @@ test('a published track under no episode marker is kept under "Preserved Tracks"
   ]);
 });
 
-// Kept too: a track the show has since taken out of an episode that is still in
-// its feed (flowgnar's "Toothy Knife Fight" lost 5 this way). It stays under
-// that episode, after the tracks the feed lists now.
-test('a track dropped from an episode still in the feed stays under that episode, after its current tracks', async () => {
+// For an episode the feed still lists, the feed decides: a track the show has
+// taken out of it is removed here too (Chad, 2026-11-17). flowgnar's
+// "Toothy Knife Fight" lost 5 tracks this way.
+test('a track the show took out of an episode still in the feed is removed', async () => {
   const DROPPED = '9b1d2c3e-4f50-4a6b-8c7d-e8f9a0b1c2d3';
   const published = PUBLISHED.replace('  </channel>', `    <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="${DROPPED}"/>\n  </channel>`);
   const pushed = [];
   await generatorReading(published, pushed).generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID }));
   assert.deepEqual(episodesAndTracks(pushed[0]), [
-    'episode: Homegrown Hits - Episode 155', `track: ${OLD_TRACK}`, `track: ${DROPPED}`
+    'episode: Homegrown Hits - Episode 155', `track: ${OLD_TRACK}`
   ]);
 });
 
 // flowgnar's feed titles an episode " Toothy Knife Fight", leading space and
-// all, and the published marker carries it. A preserved track must find that
-// episode again, not open a second marker for it at the end.
-test('a preserved track finds its episode by the title as published, outer spaces included', async () => {
+// all, and the published marker carries it. Its tracks must be matched to that
+// episode, which the feed still lists, not kept under a second marker at the end.
+test('a published track is matched to its episode by the title as published, outer spaces included', async () => {
   const spaced = ' Homegrown Hits - Episode 155';
   const published = PUBLISHED.replace('>Homegrown Hits - Episode 155<', `>${spaced}<`);
   const pushed = [];
@@ -316,6 +321,16 @@ test('a preserved track finds its episode by the title as published, outer space
     .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/episode-156.xml') }));
   assert.deepEqual(episodesAndTracks(pushed[0]), [
     'episode: Homegrown Hits - Episode 156', `track: ${NEW_TRACK}`,
-    `episode: ${spaced}`, `track: ${OLD_TRACK}`
+    `episode: ${spaced}`
   ]);
+});
+
+// The removal above must not empty a playlist when the raw RSS is unusable: on
+// 2026-10-24 a build that found no tracks in it pushed flowgnar with 0 of 256.
+test('a raw RSS that lists no tracks at all publishes nothing', async () => {
+  const pushed = [];
+  const result = await generatorReading(PUBLISHED, pushed)
+    .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/error-page.xml') }));
+  assert.equal(result.success, false);
+  assert.deepEqual(pushed, []);
 });

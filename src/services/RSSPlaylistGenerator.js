@@ -367,16 +367,32 @@ export class RSSPlaylistGenerator {
           rssFeedPairs.add(match[1]);
         }
       }
-      
+
+      // A raw RSS with no track at all (a host error page, a changed format) cannot
+      // tell a removed track from an unread one, and the removal below would empty
+      // the playlist: flowgnar went from 256 tracks to 0 this way on 2026-10-24.
+      if (rssFeedPairs.size === 0 && existingRemoteItems.length > 0) {
+        logger.warn(`Not publishing ${feedConfig.playlistId}: the raw RSS of ${feedConfig.name} lists no valueTimeSplit tracks, and the published playlist has ${existingRemoteItems.length}`);
+        return { success: false, error: 'The raw RSS lists no valueTimeSplit tracks' };
+      }
+
       // Add any remaining existing tracks not found in RSS feed (at the end)
       // BUT only if they're actually missing from RSS feed (not just from older episodes)
+      const feedEpisodeTitles = new Set(feed.items.map((item) => item.title).filter(Boolean));
       const preservedFromMissingEpisodes = [];
+      const removedByShow = [];
       for (const existingItem of existingRemoteItems) {
         if (!addedItemGuids.has(existingItem.itemGuid)) {
           // Only preserve if it's truly not in the RSS feed
           // If it's in RSS feed but wasn't added, it means it's from an older episode and should be skipped
           // The RSS feed order already includes all episodes, so we don't need to preserve "older" tracks
           if (!rssFeedPairs.has(existingItem.itemGuid)) {
+            // For an episode the feed still lists, the feed decides: a track the
+            // show took out of it is removed here too (Chad, 2026-11-17).
+            if (existingItem.episodeTitle && feedEpisodeTitles.has(existingItem.episodeTitle)) {
+              removedByShow.push(existingItem.itemGuid);
+              continue;
+            }
             let normalizedXml = existingItem.xml.trim();
             if (!normalizedXml.includes('feedGuid')) {
               normalizedXml = `      <podcast:remoteItem feedGuid="${existingItem.feedGuid}" itemGuid="${existingItem.itemGuid}"/>`;
@@ -396,7 +412,7 @@ export class RSSPlaylistGenerator {
       }
       
       const totalEpisodeCount = allRemoteItems.length;
-      logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing from RSS feed + ${preservedFromMissingEpisodes.length} preserved from missing episodes = ${totalEpisodeCount} total tracks`);
+      logger.info(`Reordered playlist from RSS feed: ${newEpisodes.length} new + ${existingEpisodes.length} existing from RSS feed + ${preservedFromMissingEpisodes.length} preserved from missing episodes = ${totalEpisodeCount} total tracks; ${removedByShow.length} removed from episodes the feed still lists`);
 
       // If no tracks found, return error
       if (totalEpisodeCount === 0) {
