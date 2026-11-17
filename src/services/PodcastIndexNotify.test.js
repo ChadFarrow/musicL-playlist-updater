@@ -1,8 +1,9 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { createServer } from 'node:http';
 import { notifyPodcastIndex, pubnotifyUrl } from './PodcastIndexNotify.js';
 import { RSSPlaylistGenerator } from './RSSPlaylistGenerator.js';
 
@@ -73,8 +74,22 @@ test('every configured feed has its own Podcast Index feed ID', () => {
 });
 
 // generatePlaylistFromRSS with the network stubbed: the RSS parse, the
-// published file, the push and the notify. The raw-RSS fetch goes to a closed
-// local port and fails, which the generator already tolerates.
+// published file, the push and the notify. The raw RSS is served locally: a
+// build that cannot read it publishes nothing (issue #17).
+const RAW_RSS = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>
+  <item><title>Episode 155</title><guid>e155</guid>
+    <podcast:valueTimeSplit startTime="60" duration="200" remotePercentage="90">
+      <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="61a16e10-359c-461a-986e-b5d91244beb7"/>
+    </podcast:valueTimeSplit>
+  </item>
+</channel></rss>`;
+const server = createServer((req, res) => res.end(RAW_RSS));
+before(() => new Promise((resolve) => server.listen(0, '127.0.0.1', resolve)));
+after(() => {
+  server.closeAllConnections();
+  return new Promise((resolve) => server.close(resolve));
+});
+
 const PUBLISHED = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
     <podcast:guid>8aad8bd9-0eac-4bfe-b290-6c73f7148155</podcast:guid>
@@ -105,7 +120,7 @@ function generator({ sync = true, pushFails = false } = {}) {
 }
 
 function hgh(extra = {}) {
-  return { name: 'Homegrown Hits Podcast', rssUrl: 'http://127.0.0.1:9/feed.xml', playlistId: 'HGH-music-playlist', ...extra };
+  return { name: 'Homegrown Hits Podcast', rssUrl: `http://127.0.0.1:${server.address().port}/feed.xml`, playlistId: 'HGH-music-playlist', ...extra };
 }
 
 test('a pushed playlist with a piFeedId notifies Podcast Index after the push', async () => {

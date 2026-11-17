@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { createServer } from 'node:http';
 import { PodPing, PODPING_MEDIUMS, podpingConfigFrom, pusherRequestUrl } from './PodPing.js';
 import { RSSPlaylistGenerator, podpingFeedUrl } from './RSSPlaylistGenerator.js';
 
@@ -110,7 +111,22 @@ test('a musicL PodPing names the URL Podcast Index lists the playlist under', ()
   assert.equal(podpingFeedUrl(config, 'HGH-music-playlist'), HGH_PI_URL);
 });
 
-test('a pushed musicL playlist is PodPinged as musicL, after the push and the PI notify', async () => {
+test('a pushed musicL playlist is PodPinged as musicL, after the push and the PI notify', async (t) => {
+  // The raw RSS, served locally: a build that cannot read it publishes nothing.
+  const RAW_RSS = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>
+    <item><title>Episode 155</title><guid>e155</guid>
+      <podcast:valueTimeSplit startTime="60" duration="200" remotePercentage="90">
+        <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="61a16e10-359c-461a-986e-b5d91244beb7"/>
+      </podcast:valueTimeSplit>
+    </item>
+  </channel></rss>`;
+  const server = createServer((req, res) => res.end(RAW_RSS));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => {
+    server.closeAllConnections();
+    server.close();
+  });
+
   const events = [];
   const gen = new RSSPlaylistGenerator({
     enableGitHubSync: true,
@@ -138,7 +154,7 @@ test('a pushed musicL playlist is PodPinged as musicL, after the push and the PI
   };
   await gen.generatePlaylistFromRSS({
     name: 'Homegrown Hits Podcast',
-    rssUrl: 'http://127.0.0.1:9/feed.xml',
+    rssUrl: `http://127.0.0.1:${server.address().port}/feed.xml`,
     playlistId: 'HGH-music-playlist',
     piFeedId: 7443404
   });

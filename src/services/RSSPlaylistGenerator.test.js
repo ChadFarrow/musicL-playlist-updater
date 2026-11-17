@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -64,10 +64,57 @@ test('every configured feed has its own fixed playlistGuid', () => {
   assert.equal(hgh.playlistGuid, PI_GUID, 'HGH keeps the guid Podcast Index holds');
 });
 
-// Drives generatePlaylistFromRSS with the network stubbed out: the RSS parse,
-// the published file and the push. The raw-RSS fetch goes to a closed local
-// port and fails, which the generator already tolerates.
-function generatorReading(published, pushed) {
+// The source show as raw RSS: the one track of PUBLISHED, in a valueTimeSplit
+// of the episode it was played in.
+const OLD_TRACK = '61a16e10-359c-461a-986e-b5d91244beb7';
+const RAW_RSS = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>
+  <title>Homegrown Hits</title>
+  <item><title>Homegrown Hits - Episode 155</title><guid>episode-155</guid>
+    <podcast:valueTimeSplit startTime="60" duration="200" remotePercentage="90">
+      <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="${OLD_TRACK}"/>
+    </podcast:valueTimeSplit>
+  </item>
+</channel></rss>`;
+
+// The next day: Episode 156 played one new track, and Episode 155 has left the
+// feed, as in a feed that lists only its newest episodes.
+const NEW_TRACK = '0e5c4b7a-9a52-4c8e-b0f4-2d6c3f1a7b90';
+const RAW_RSS_156 = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>
+  <title>Homegrown Hits</title>
+  <item><title>Homegrown Hits - Episode 156</title><guid>episode-156</guid>
+    <podcast:valueTimeSplit startTime="30" duration="180" remotePercentage="90">
+      <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="${NEW_TRACK}"/>
+    </podcast:valueTimeSplit>
+  </item>
+</channel></rss>`;
+
+const EPISODE_155 = { title: 'Homegrown Hits - Episode 155', guid: 'episode-155' };
+const EPISODE_156 = { title: 'Homegrown Hits - Episode 156', guid: 'episode-156' };
+
+// The raw-RSS fetch reads the feeds from a local server, by path. A URL on
+// port 9, where nothing listens, makes that fetch fail.
+const FEEDS = new Map([
+  ['/feed.xml', RAW_RSS],
+  ['/episode-156.xml', RAW_RSS_156],
+  // A host error page served with 200, read after rss-parser read the feed.
+  ['/error-page.xml', '<html><body>Service temporarily unavailable</body></html>']
+]);
+const server = createServer((req, res) => {
+  const body = FEEDS.get(req.url);
+  res.statusCode = body === undefined ? 404 : 200;
+  res.end(body ?? '');
+});
+before(() => new Promise((resolve) => server.listen(0, '127.0.0.1', resolve)));
+after(() => {
+  server.closeAllConnections();
+  return new Promise((resolve) => server.close(resolve));
+});
+const served = (path) => `http://127.0.0.1:${server.address().port}${path}`;
+const UNREACHABLE = 'http://127.0.0.1:9/feed.xml';
+
+// Drives generatePlaylistFromRSS with the RSS parse, the published file and the
+// push stubbed out. `items` are the episodes the parsed feed lists.
+function generatorReading(published, pushed, items = [EPISODE_155]) {
   const generator = new RSSPlaylistGenerator({
     enableGitHubSync: true,
     playlistsDir: mkdtempSync(join(tmpdir(), 'rss-playlist-')),
@@ -77,7 +124,7 @@ function generatorReading(published, pushed) {
     parseURL: async () => ({
       title: 'Homegrown Hits',
       link: 'https://homegrownhits.xyz',
-      items: [{ title: 'Homegrown Hits - Episode 155', guid: 'episode-155' }]
+      items
     })
   };
   generator.githubSync = {
@@ -90,7 +137,7 @@ function generatorReading(published, pushed) {
 function feedConfig(extra = {}) {
   return {
     name: 'Homegrown Hits Podcast',
-    rssUrl: 'http://127.0.0.1:9/feed.xml',
+    rssUrl: served('/feed.xml'),
     playlistId: 'HGH-music-playlist',
     playlistTitle: 'ChadF Homegrown Hits Music Playlist',
     ...extra
@@ -168,29 +215,12 @@ test('a rebuilt playlist links back to the publisher feed, before its medium', a
   assert.ok(pushed[0].indexOf('<podcast:publisher>') < pushed[0].indexOf('<podcast:medium>musicL'));
 });
 
-// The source show as raw RSS: the one track of PUBLISHED, in a valueTimeSplit
-// of the episode it was played in. Served locally so the tracks really flow
-// (with the fetch failing, every track lands in "Preserved Tracks").
-const RAW_RSS = `<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>
-  <title>Homegrown Hits</title>
-  <item><title>Homegrown Hits - Episode 155</title><guid>episode-155</guid>
-    <podcast:valueTimeSplit startTime="60" duration="200" remotePercentage="90">
-      <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="61a16e10-359c-461a-986e-b5d91244beb7"/>
-    </podcast:valueTimeSplit>
-  </item>
-</channel></rss>`;
-
-test('rebuilding from a published back-link keeps one back-link and the same tracks', async (t) => {
-  const server = createServer((req, res) => res.end(RAW_RSS));
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-  t.after(() => server.close());
-  const rssUrl = `http://127.0.0.1:${server.address().port}/feed.xml`;
-
+test('rebuilding from a published back-link keeps one back-link and the same tracks', async () => {
   const pushed = [];
   const generator = generatorReading(PUBLISHED, pushed);
   // Each build reads the file the previous build pushed, back-link included.
   generator.githubSync.getFileContent = async () => pushed.at(-1) ?? PUBLISHED;
-  const config = feedConfig({ playlistGuid: PI_GUID, rssUrl });
+  const config = feedConfig({ playlistGuid: PI_GUID });
   for (let i = 0; i < 3; i += 1) await generator.generatePlaylistFromRSS(config);
 
   assert.equal(pushed.length, 3);
@@ -217,4 +247,90 @@ test('a title with "&" is escaped once, also when it was read back already escap
     assert.match(pushed[0], /<author>Chad &amp; Reed<\/author>/);
     assert.doesNotMatch(pushed[0], BARE_AMP);
   }
+});
+
+// Issue #17: a track the generator says it preserves must be in the pushed
+// file, and a build that could not read the raw RSS must push nothing.
+
+// One line per episode marker and per track, in file order.
+function episodesAndTracks(xml) {
+  return [...xml.matchAll(/<podcast:txt purpose="episode">([^<]*)<\/podcast:txt>|<podcast:remoteItem[^>]*itemGuid="([^"]+)"/g)]
+    .map((m) => (m[1] !== undefined ? `episode: ${m[1]}` : `track: ${m[2]}`));
+}
+
+test('a failed raw-RSS fetch publishes nothing', async () => {
+  const pushed = [];
+  const result = await generatorReading(PUBLISHED, pushed)
+    .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: UNREACHABLE }));
+  assert.equal(result.success, false);
+  assert.deepEqual(pushed, []);
+});
+
+test('a track whose episode left the feed stays under that episode, after the feed\'s episodes', async () => {
+  // A title with "&" also checks that the marker is read back decoded and
+  // written escaped once, build after build.
+  const published = PUBLISHED.replace('Episode 155<', 'Episode 155 &amp; Friends<');
+  const pushed = [];
+  const generator = generatorReading(published, pushed, [EPISODE_156]);
+  // Each build reads the file the previous build pushed.
+  generator.githubSync.getFileContent = async () => pushed.at(-1) ?? published;
+  const config = feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/episode-156.xml') });
+  for (let i = 0; i < 3; i += 1) await generator.generatePlaylistFromRSS(config);
+
+  assert.equal(pushed.length, 3);
+  for (const xml of pushed) {
+    assert.deepEqual(episodesAndTracks(xml), [
+      'episode: Homegrown Hits - Episode 156', `track: ${NEW_TRACK}`,
+      'episode: Homegrown Hits - Episode 155 &amp; Friends', `track: ${OLD_TRACK}`
+    ]);
+  }
+});
+
+test('a published track under no episode marker is kept under "Preserved Tracks"', async () => {
+  const unmarked = PUBLISHED.replace(/\s*<podcast:txt purpose="episode">.*<\/podcast:txt>/, '');
+  const pushed = [];
+  await generatorReading(unmarked, pushed, [EPISODE_156])
+    .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/episode-156.xml') }));
+  assert.deepEqual(episodesAndTracks(pushed[0]), [
+    'episode: Homegrown Hits - Episode 156', `track: ${NEW_TRACK}`,
+    'episode: Preserved Tracks', `track: ${OLD_TRACK}`
+  ]);
+});
+
+// For an episode the feed still lists, the feed decides: a track the show has
+// taken out of it is removed here too (Chad, 2026-11-17). flowgnar's
+// "Toothy Knife Fight" lost 5 tracks this way.
+test('a track the show took out of an episode still in the feed is removed', async () => {
+  const DROPPED = '9b1d2c3e-4f50-4a6b-8c7d-e8f9a0b1c2d3';
+  const published = PUBLISHED.replace('  </channel>', `    <podcast:remoteItem feedGuid="ac746d09-7c3b-5bcd-b28a-f12d6456ca8f" itemGuid="${DROPPED}"/>\n  </channel>`);
+  const pushed = [];
+  await generatorReading(published, pushed).generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID }));
+  assert.deepEqual(episodesAndTracks(pushed[0]), [
+    'episode: Homegrown Hits - Episode 155', `track: ${OLD_TRACK}`
+  ]);
+});
+
+// flowgnar's feed titles an episode " Toothy Knife Fight", leading space and
+// all, and the published marker carries it. Its tracks must be matched to that
+// episode, which the feed still lists, not kept under a second marker at the end.
+test('a published track is matched to its episode by the title as published, outer spaces included', async () => {
+  const spaced = ' Homegrown Hits - Episode 155';
+  const published = PUBLISHED.replace('>Homegrown Hits - Episode 155<', `>${spaced}<`);
+  const pushed = [];
+  await generatorReading(published, pushed, [EPISODE_156, { title: spaced, guid: 'episode-155' }])
+    .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/episode-156.xml') }));
+  assert.deepEqual(episodesAndTracks(pushed[0]), [
+    'episode: Homegrown Hits - Episode 156', `track: ${NEW_TRACK}`,
+    `episode: ${spaced}`
+  ]);
+});
+
+// The removal above must not empty a playlist when the raw RSS is unusable: on
+// 2026-10-24 a build that found no tracks in it pushed flowgnar with 0 of 256.
+test('a raw RSS that lists no tracks at all publishes nothing', async () => {
+  const pushed = [];
+  const result = await generatorReading(PUBLISHED, pushed)
+    .generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID, rssUrl: served('/error-page.xml') }));
+  assert.equal(result.success, false);
+  assert.deepEqual(pushed, []);
 });
