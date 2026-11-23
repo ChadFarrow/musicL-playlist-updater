@@ -63,12 +63,16 @@ test('notifyPodcastIndex never throws, and sends nothing for a bad ID', async ()
   assert.equal(none.calls.length, 0);
 });
 
-test('every configured feed has its own Podcast Index feed ID', () => {
+// A feed that Podcast Index does not hold yet has no piFeedId (CLAUDE.md, "Adding a
+// New Feed"), and the generator then skips the notify. A piFeedId that is there must
+// be valid and belong to one feed only.
+test('every configured Podcast Index feed ID is valid and its own', () => {
   const config = JSON.parse(readFileSync(new URL('../config/feeds.json', import.meta.url), 'utf8'));
-  const ids = config.rssFeeds.map((feed) => feed.piFeedId);
-  for (const [i, id] of ids.entries()) {
-    assert.ok(pubnotifyUrl(id), `${config.rssFeeds[i].playlistId} has no piFeedId`);
+  const listed = config.rssFeeds.filter((feed) => feed.piFeedId !== undefined);
+  for (const feed of listed) {
+    assert.ok(pubnotifyUrl(feed.piFeedId), `${feed.playlistId} has an invalid piFeedId`);
   }
+  const ids = listed.map((feed) => feed.piFeedId);
   assert.equal(new Set(ids).size, ids.length, 'two feeds share a piFeedId');
   assert.equal(config.rssFeeds.find((feed) => feed.playlistId === 'HGH-music-playlist').piFeedId, HGH_FEED_ID);
 });

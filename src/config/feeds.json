@@ -175,6 +175,21 @@
       "lastChecked": "2026-11-22T15:13:48.244Z",
       "lastEpisodeGuid": "fc474fd9-4b30-42d6-a12c-615b4a7630fa",
       "checkIntervalMinutes": 1440
+    },
+    {
+      "id": "onlyboosts-social-hour-feed",
+      "name": "The OnlyBoosts Social Hour",
+      "rssUrl": "https://serve.podhome.fm/rss/de0bcde8-964b-4d71-9280-85d0ca2682c8",
+      "playlistId": "OBSH-music-playlist",
+      "playlistGuid": "d29f5cf4-1275-4c7f-bbc3-1ab86985b5cc",
+      "playlistTitle": "The OnlyBoosts Social Hour Music Playlist",
+      "playlistDescription": "Every music reference from The OnlyBoosts Social Hour",
+      "playlistAuthor": "ChadF",
+      "playlistImageUrl": "https://raw.githubusercontent.com/ChadFarrow/chadf-musicl-playlists/main/docs/OBSH-playlist-art.jpg",
+      "enabled": true,
+      "lastChecked": null,
+      "lastEpisodeGuid": null,
+      "checkIntervalMinutes": 1440
     }
   ],
   "playlists": [],
