@@ -133,7 +133,7 @@ RSS Feed → RSSPlaylistGenerator.checkFeedForUpdates()
 
 When adding a new feed, three things must be done for the daily CI to pick it up:
 
-1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`. Leave `playlistGuid` out: the first build keeps the seed playlist's `<podcast:guid>` (or mints one) and saves it. Add `piFeedId` once the feed is in Podcast Index
+1. **Add feed entry to `src/config/feeds.json`** — with `rssUrl`, `playlistId`, playlist metadata, and `lastEpisodeGuid: null`. Leave `playlistGuid` out: the first build keeps the seed playlist's `<podcast:guid>` (or mints one) and saves it. Or set it to the seed's guid, so the publisher feed entry and the first build cannot disagree (done for `OBSH-music-playlist`, 2026-11-23). Add `piFeedId` once the feed is in Podcast Index; until then the build sends no pubnotify, and the `piFeedId` test accepts a feed without one
 2. **Add entry to `FEEDS.md` in the target repo** (`chadf-musicl-playlists`) — the daily script reads this as the source of truth. **`parseFeedsMarkdown` (`GitHubSync.js`) keeps only IDs that contain `-music-playlist`, `-muic-playlist` or `-musicl-`**; any other ID (the podcastL playlists) is dropped without a log line
 3. **Seed an initial playlist XML in the target repo** (`docs/{playlistId}.xml`) — the daily script's `discoverPlaylists()` only matches feeds that already have an XML file in `docs/`, and it requires a `<podcast:txt purpose="source-feed">` tag in the XML to extract the RSS URL. Without this, the feed silently gets skipped even if it's in `FEEDS.md`
 
