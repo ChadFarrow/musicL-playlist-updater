@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from './src/utils/userAgent.js';
 
 console.log('📥 Downloading all XML playlists from GitHub repository...\n');
 
@@ -22,7 +23,7 @@ try {
   const response = await axios.get(githubApiUrl, {
     headers: {
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'musicl-playlist-updater'
+      'User-Agent': USER_AGENT
     }
   });
 
@@ -49,7 +50,7 @@ try {
       const fileResponse = await axios.get(rawUrl, {
         headers: {
           'Accept': 'application/xml, text/xml, */*',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         },
         timeout: 10000
       });

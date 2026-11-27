@@ -21,6 +21,7 @@ import Parser from 'rss-parser';
 import { logger } from '../utils/logger.js';
 import { withRetry, isAccessError } from '../utils/retry.js';
 import { escapeXml, sameApartFromBuildDates } from '../utils/xml.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 const SHOWS_URL = 'https://smallgroupscoop.com/shows/';
 const EPISODES_PER_SHOW = 10;
@@ -90,8 +91,6 @@ const KNOWN_FEEDS = {
   v4vmusic: { name: 'v4vmusic', feedUrl: 'https://cdn.kolomona.com/podcasts/v4vmusic/v4vmusic-rss.xml' }
 };
 
-const USER_AGENT =
-  'Mozilla/5.0 (compatible; musicL-playlist-updater/1.0; +https://github.com/ChadFarrow/chadf-musicl-playlists)';
 const FETCH_TIMEOUT_MS = 30000;
 const FETCH_RETRIES = 2;
 const FETCH_RETRY_DELAY_MS = 10000;

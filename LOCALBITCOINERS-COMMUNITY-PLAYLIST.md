@@ -23,7 +23,7 @@ https://localbitcoiners.com/api/community-boosts
 Each entry in `boosts[]` carries `podcast_guid` (→ `feedGuid`) and `item_guid`
 (→ `itemGuid`), which is exactly what a `<podcast:remoteItem>` needs. The script:
 
-1. Fetches the JSON snapshot (with a browser `User-Agent`, retrying transient failures).
+1. Fetches the JSON snapshot (with the app's shared `User-Agent`, `src/utils/userAgent.js`, retrying transient failures).
 2. Extracts `feedGuid`/`itemGuid` pairs, skipping records missing a usable guid.
 3. Dedupes by `feedGuid::itemGuid`.
 4. **Merges with the currently-published playlist** so the rolling hourly snapshot never

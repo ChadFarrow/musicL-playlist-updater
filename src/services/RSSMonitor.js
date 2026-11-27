@@ -3,11 +3,13 @@ import axios from 'axios';
 import { logger } from '../utils/logger.js';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 export class RSSMonitor {
   constructor(configPath = './src/config/feeds.json') {
     this.configPath = configPath;
     this.parser = new Parser({
+      headers: { 'User-Agent': USER_AGENT },
       customFields: {
         item: [
           ['podcast:remoteItem', 'remoteItem'],

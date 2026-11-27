@@ -3,6 +3,7 @@
 import Parser from 'rss-parser';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from './src/utils/userAgent.js';
 
 class MusicPlaylistUpdater {
   constructor(config = {}) {
@@ -11,6 +12,7 @@ class MusicPlaylistUpdater {
       ...config
     };
     this.parser = new Parser({
+      headers: { 'User-Agent': USER_AGENT },
       customFields: {
         feed: [
           ['podcast:podroll', 'podroll'],
@@ -176,7 +178,7 @@ class MusicPlaylistUpdater {
   async extractRemoteItemsFromFeed(feedUrl) {
     try {
       // Fetch raw RSS XML to parse remote items directly
-      const response = await fetch(feedUrl);
+      const response = await fetch(feedUrl, { headers: { 'User-Agent': USER_AGENT } });
       const rssXml = await response.text();
       
       // Extract all remote items from the raw XML (handle both single and double quotes)

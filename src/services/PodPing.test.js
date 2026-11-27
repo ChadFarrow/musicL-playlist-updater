@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { createServer } from 'node:http';
 import { PodPing, PODPING_MEDIUMS, podpingConfigFrom, pusherRequestUrl } from './PodPing.js';
 import { RSSPlaylistGenerator, podpingFeedUrl } from './RSSPlaylistGenerator.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 const ENDPOINT = 'https://msp-podping.example.up.railway.app/';
 const TOKEN = 'test-bearer-token-not-a-real-one';
@@ -62,6 +63,7 @@ test('sendNotification sends the bearer token and reports what the pusher queued
   assert.deepEqual(await client.sendNotification(HGH_PI_URL, { medium: 'musicL' }), { success: true, message: 'enqueued' });
   assert.equal(web.calls.length, 1);
   assert.equal(web.calls[0].options.headers.Authorization, `Bearer ${TOKEN}`);
+  assert.equal(web.calls[0].options.headers['User-Agent'], USER_AGENT);
   assert.equal(new URL(web.calls[0].url).searchParams.get('medium'), 'musicL');
 });
 
