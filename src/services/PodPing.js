@@ -13,6 +13,7 @@
  */
 import axios from 'axios';
 import { logger } from '../utils/logger.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 // podping-schemas podping.json, v1.0 + v1.1 mediums; hivepinger's Medium enum.
 export const PODPING_MEDIUMS = [
@@ -87,7 +88,7 @@ export class PodPing {
     try {
       const response = await this.get(requestUrl, {
         timeout: this.timeout,
-        headers: { Authorization: `Bearer ${this.bearerToken}`, 'User-Agent': 'musicl-playlist-updater' }
+        headers: { Authorization: `Bearer ${this.bearerToken}`, 'User-Agent': USER_AGENT }
       });
       // hivepinger's detailed response: { message: "enqueued" | "duplicate" | …, reason, medium, url }.
       // A duplicate means the same ping is already queued, which is success.

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createServer } from 'node:http';
 import { RSSPlaylistGenerator, stablePlaylistGuid, PUBLISHER_FEED } from './RSSPlaylistGenerator.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 // Header of docs/HGH-music-playlist.xml as published 2026-10-23 19:28 UTC, when
 // every rebuild still minted a new <podcast:guid> (this one is not the guid
@@ -99,7 +100,10 @@ const FEEDS = new Map([
   // A host error page served with 200, read after rss-parser read the feed.
   ['/error-page.xml', '<html><body>Service temporarily unavailable</body></html>']
 ]);
+// The User-Agent of each request, so a test can check what a feed host sees.
+const requests = [];
 const server = createServer((req, res) => {
+  requests.push({ path: req.url, userAgent: req.headers['user-agent'] });
   const body = FEEDS.get(req.url);
   res.statusCode = body === undefined ? 404 : 200;
   res.end(body ?? '');
@@ -147,6 +151,20 @@ function feedConfig(extra = {}) {
 function guidOf(xml) {
   return xml.match(/<podcast:guid>([^<]+)<\/podcast:guid>/)[1];
 }
+
+test('both feed fetches send the shared User-Agent: rss-parser and the raw-RSS read', async () => {
+  const pushed = [];
+  const generator = generatorReading(PUBLISHED, pushed);
+  // The real parser, not the stub, so its own request reaches the server.
+  generator.parser = new RSSPlaylistGenerator({}).parser;
+  requests.length = 0;
+  await generator.generatePlaylistFromRSS(feedConfig({ playlistGuid: PI_GUID }));
+  assert.equal(pushed.length, 1);
+  assert.deepEqual(requests, [
+    { path: '/feed.xml', userAgent: USER_AGENT },
+    { path: '/feed.xml', userAgent: USER_AGENT }
+  ]);
+});
 
 test('a rebuild publishes the configured guid, not a new one', async () => {
   const pushed = [];

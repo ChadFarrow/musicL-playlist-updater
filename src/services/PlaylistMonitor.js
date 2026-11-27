@@ -2,6 +2,7 @@ import axios from 'axios';
 import { logger } from '../utils/logger.js';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 export class PlaylistMonitor {
   constructor(config) {
@@ -18,7 +19,7 @@ export class PlaylistMonitor {
       const response = await axios.get(url, {
         headers: {
           'Accept': 'application/xml, text/xml, */*',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         },
         timeout: 10000
       });

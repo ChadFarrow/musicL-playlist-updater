@@ -5,6 +5,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { extractChannelGuid } from './SmallGroupPlaylistAggregator.js';
 import { notifyPodcastIndex } from './PodcastIndexNotify.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 /**
  * The <podcast:guid> a musicL playlist is published under. It is the feed's
@@ -55,6 +56,7 @@ export class RSSPlaylistGenerator {
   constructor(config) {
     this.config = config;
     this.parser = new Parser({
+      headers: { 'User-Agent': USER_AGENT },
       customFields: {
         item: [
           ['podcast:remoteItem', 'remoteItem'],
@@ -104,7 +106,7 @@ export class RSSPlaylistGenerator {
       // Fetch raw RSS XML to extract feedGuid/itemGuid pairs from valueTimeSplit tags
       let rssXml = null;
       try {
-        const response = await axios.get(feedConfig.rssUrl);
+        const response = await axios.get(feedConfig.rssUrl, { headers: { 'User-Agent': USER_AGENT } });
         rssXml = response.data;
       } catch (error) {
         logger.warn(`Could not fetch raw RSS XML: ${error.message}`);

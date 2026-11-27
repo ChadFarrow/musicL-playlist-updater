@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from './src/utils/userAgent.js';
 
 class GitHubFeedPuller {
   constructor() {
@@ -74,7 +75,7 @@ class GitHubFeedPuller {
       const response = await axios.get(this.githubApiUrl, {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         }
       });
 
@@ -94,7 +95,7 @@ class GitHubFeedPuller {
       const response = await axios.get(rawUrl, {
         headers: {
           'Accept': 'application/xml, text/xml, */*',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         },
         timeout: 10000
       });

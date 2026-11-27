@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { logger } from '../utils/logger.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 export class PlaylistDiscovery {
   constructor(config) {
@@ -15,7 +16,7 @@ export class PlaylistDiscovery {
       const response = await axios.get(this.githubApiUrl, {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         }
       });
 
@@ -54,7 +55,7 @@ export class PlaylistDiscovery {
       const response = await axios.get(rawUrl, {
         headers: {
           'Accept': 'application/xml, text/xml, */*',
-          'User-Agent': 'musicl-playlist-updater'
+          'User-Agent': USER_AGENT
         },
         timeout: 10000
       });

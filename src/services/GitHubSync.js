@@ -2,6 +2,7 @@ import axios from 'axios';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { logger } from '../utils/logger.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 export class GitHubSync {
   constructor(token, owner, repo, branch = 'main') {
@@ -13,7 +14,7 @@ export class GitHubSync {
     this.headers = {
       'Authorization': `token ${token}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'musicl-playlist-updater'
+      'User-Agent': USER_AGENT
     };
   }
 

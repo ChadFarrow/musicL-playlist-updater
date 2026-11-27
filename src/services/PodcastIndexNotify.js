@@ -16,6 +16,7 @@
  * notified at all.
  */
 import axios from 'axios';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 const PUBNOTIFY_URL = 'https://api.podcastindex.org/api/1.0/hub/pubnotify';
 
@@ -34,7 +35,7 @@ export async function notifyPodcastIndex(feedId, { get = axios.get, timeout = 10
   const url = pubnotifyUrl(feedId);
   if (!url) return { success: false, message: `not a Podcast Index feed ID: ${JSON.stringify(feedId)}` };
   try {
-    const response = await get(url, { timeout, headers: { 'User-Agent': 'musicl-playlist-updater' } });
+    const response = await get(url, { timeout, headers: { 'User-Agent': USER_AGENT } });
     const body = response?.data || {};
     const message = body.description || `HTTP ${response?.status}`;
     // PI answers status as the STRING "true" or "false".

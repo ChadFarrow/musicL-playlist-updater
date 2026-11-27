@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { createServer } from 'node:http';
 import { notifyPodcastIndex, pubnotifyUrl } from './PodcastIndexNotify.js';
 import { RSSPlaylistGenerator } from './RSSPlaylistGenerator.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 const HGH_FEED_ID = 7443404;
 // PI's real answer to /hub/pubnotify?id=7443404 on 2026-10-23.
@@ -40,7 +41,7 @@ test('notifyPodcastIndex reports PI accepting the notification', async () => {
   });
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, 'https://api.podcastindex.org/api/1.0/hub/pubnotify?id=7443404');
-  assert.equal(calls[0].options.headers['User-Agent'], 'musicl-playlist-updater');
+  assert.equal(calls[0].options.headers['User-Agent'], USER_AGENT);
 });
 
 test('notifyPodcastIndex reports a "false" status as a failure', async () => {

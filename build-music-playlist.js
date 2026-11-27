@@ -3,6 +3,7 @@
 import Parser from 'rss-parser';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { USER_AGENT } from './src/utils/userAgent.js';
 
 class MusicPlaylistBuilder {
   constructor(config = {}) {
@@ -11,6 +12,7 @@ class MusicPlaylistBuilder {
       ...config
     };
     this.parser = new Parser({
+      headers: { 'User-Agent': USER_AGENT },
       customFields: {
         item: [
           ['podcast:remoteItem', 'remoteItem'],

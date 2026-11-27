@@ -4,6 +4,7 @@ import { join } from 'path';
 import { logger } from '../utils/logger.js';
 import { withRetry } from '../utils/retry.js';
 import { escapeXml, extractRemoteItems, sameApartFromBuildDates } from '../utils/xml.js';
+import { USER_AGENT } from '../utils/userAgent.js';
 
 /**
  * Aggregate the podcast episodes surfaced at localbitcoiners.com/feeds into ONE
@@ -38,8 +39,6 @@ const PLAYLIST_DESCRIPTION =
 // randomized per run).
 const PLAYLIST_GUID = 'd3f1a5e0-9c4b-4e7a-8f2d-6b1c0a9e5d3f';
 
-const USER_AGENT =
-  'Mozilla/5.0 (compatible; musicL-playlist-updater/1.0; +https://github.com/ChadFarrow/chadf-musicl-playlists)';
 const FETCH_TIMEOUT_MS = 30000;
 const FETCH_RETRIES = 2;
 const FETCH_RETRY_DELAY_MS = 10000;
